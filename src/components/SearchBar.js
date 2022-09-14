@@ -1,8 +1,9 @@
 import searchIcon from "../resources/search-icon.svg";
+import "./SearchBar.css";
 
 export default function SearchBar({ search, setSearch }) {
   return (
-    <form className="search-bar" onSubmit={(e) => e.preventDefault()}>
+    <div className="search-bar">
       <label>이름 검색:</label>
       <div className="input-container">
         <input
@@ -12,6 +13,6 @@ export default function SearchBar({ search, setSearch }) {
         />
         <img src={searchIcon} alt="" />
       </div>
-    </form>
+    </div>
   );
 }

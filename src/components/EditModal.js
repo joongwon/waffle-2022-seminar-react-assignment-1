@@ -1,10 +1,14 @@
 import { useState } from "react";
 import Modal from "./Modal";
 
-export default function EditModal({ handleUpdateMenu, handleCloseModal }) {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [image, setImage] = useState("");
+export default function EditModal({
+  handleUpdateMenu,
+  handleCloseModal,
+  initialData,
+}) {
+  const [name, setName] = useState(initialData.name);
+  const [price, setPrice] = useState(initialData.price);
+  const [image, setImage] = useState(initialData.image);
   return (
     <Modal>
       <div className="modal-title">메뉴 수정</div>
@@ -16,11 +20,14 @@ export default function EditModal({ handleUpdateMenu, handleCloseModal }) {
           onChange={(e) => setName(e.target.value)}
         />
         <label htmlFor="price">가격</label>
-        <input
-          id="price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
+        <div className="input-container">
+          <input
+            id="price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
+          <span className="input-suffix">원</span>
+        </div>
         <label htmlFor="image">상품 이미지</label>
         <input
           id="image"
@@ -31,7 +38,10 @@ export default function EditModal({ handleUpdateMenu, handleCloseModal }) {
       <div className="modal-button-container">
         <button
           className="green-button"
-          onClick={() => handleUpdateMenu({ name, price, image })}
+          onClick={() => {
+            handleUpdateMenu({ name, price: Number(price), image });
+            handleCloseModal();
+          }}
         >
           저장
         </button>

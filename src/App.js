@@ -51,7 +51,7 @@ function App() {
     <>
       <div className="app">
         <Header />
-        <div className={`container ${selectedId === null ? "selected" : ""}`}>
+        <div className={`container ${selectedId !== null ? "selected" : ""}`}>
           <div className="search-wrapper">
             <SearchBar search={search} setSearch={setSearch} />
           </div>
@@ -68,7 +68,7 @@ function App() {
               <img src={addIcon} alt="새 메뉴" />
             </button>
           </div>
-          {selectedId !== null && (
+          {selectedMenu && (
             <div className="details-wrapper">
               <MenuDetails
                 menu={selectedMenu}
@@ -79,21 +79,29 @@ function App() {
           )}
         </div>
       </div>
-      <div className="modal-container">
-        {modal === MODAL_ADD ? (
-          <AddModal handleAddMenu={addMenu} handleCloseModal={closeModal} />
-        ) : modal === MODAL_EDIT ? (
-          <EditModal
-            handleUpdateMenu={updateMenu}
-            handleCloseModal={closeModal}
-          />
-        ) : modal === MODAL_DELETE ? (
-          <DeleteModal
-            handleDeleteMenu={deleteMenu}
-            handleCloseModal={closeModal}
-          />
-        ) : null}
-      </div>
+      {modal !== MODAL_NONE && (
+        <div
+          className="modal-container"
+          onClick={() => {
+            closeModal();
+          }}
+        >
+          {modal === MODAL_ADD ? (
+            <AddModal handleAddMenu={addMenu} handleCloseModal={closeModal} />
+          ) : modal === MODAL_EDIT ? (
+            <EditModal
+              handleUpdateMenu={updateMenu}
+              handleCloseModal={closeModal}
+              initialData={selectedMenu}
+            />
+          ) : modal === MODAL_DELETE ? (
+            <DeleteModal
+              handleDeleteMenu={deleteMenu}
+              handleCloseModal={closeModal}
+            />
+          ) : null}
+        </div>
+      )}
     </>
   );
 }

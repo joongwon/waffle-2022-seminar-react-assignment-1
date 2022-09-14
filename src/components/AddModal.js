@@ -16,11 +16,14 @@ export default function AddModal({ handleAddMenu, handleCloseModal }) {
           onChange={(e) => setName(e.target.value)}
         />
         <label htmlFor="price">가격</label>
-        <input
-          id="price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
+        <div className="input-container">
+          <input
+            id="price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
+          <span className="input-suffix">원</span>
+        </div>
         <label htmlFor="image">상품 이미지</label>
         <input
           id="image"
@@ -31,7 +34,10 @@ export default function AddModal({ handleAddMenu, handleCloseModal }) {
       <div className="modal-button-container">
         <button
           className="green-button"
-          onClick={() => handleAddMenu({ name, price, image })}
+          onClick={() => {
+            handleAddMenu({ name, price: Number(price), image });
+            handleCloseModal();
+          }}
         >
           추가
         </button>

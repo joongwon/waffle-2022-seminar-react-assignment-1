@@ -4,6 +4,7 @@ import editIcon from "../resources/edit-icon.svg";
 import deleteIcon from "../resources/delete-icon.svg";
 import { formatPrice } from "../lib/formatting";
 import { MODAL_DELETE, MODAL_EDIT } from "../lib/modalTypes";
+import "./MenuDetails.css";
 
 export default function MenuDetails({ menu, setModal, handleCloseDetail }) {
   const formattedPrice = formatPrice(menu.price);
@@ -18,7 +19,7 @@ export default function MenuDetails({ menu, setModal, handleCloseDetail }) {
           alt="상품 이미지"
         />
         <h3>{menu.name}</h3>
-        <p>{formattedPrice}</p>
+        <p>{formattedPrice}원</p>
         <div className="buttons-container">
           <button onClick={() => setModal(MODAL_EDIT)}>
             <img src={editIcon} alt="수정" />

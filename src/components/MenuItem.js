@@ -1,12 +1,15 @@
+import { formatPrice } from "../lib/formatting";
+
 export default function MenuItem({ menu, selected, handleSelect }) {
+  const formattedPrice = formatPrice(menu.price);
   return (
-    <tr
+    <li
       className={`menu-item ${selected ? "selected" : ""}`}
       onClick={handleSelect}
     >
-      <td>{menu.id}</td>
-      <td>{menu.name}</td>
-      <td>{menu.price}</td>
-    </tr>
+      <div>{menu.id}</div>
+      <div>{menu.name}</div>
+      <div>{formattedPrice}</div>
+    </li>
   );
 }
