@@ -4,9 +4,11 @@ export default function MenuList({ menus, selectedId, setSelectedId }) {
   return (
     <table className="menu-list">
       <thead>
-        <th>ID</th>
-        <th>이름</th>
-        <th>가격</th>
+        <tr>
+          <th>ID</th>
+          <th>이름</th>
+          <th>가격</th>
+        </tr>
       </thead>
       <tbody>
         {menus.map((menu) => (
