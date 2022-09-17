@@ -1,4 +1,5 @@
 import { formatPrice } from "../lib/formatting";
+import "./MenuItem.css";
 
 export default function MenuItem({ menu, selected, handleSelect }) {
   const formattedPrice = formatPrice(menu.price);
