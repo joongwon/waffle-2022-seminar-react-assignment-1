@@ -97,7 +97,10 @@ function App() {
             />
           ) : modal === MODAL_DELETE ? (
             <DeleteModal
-              handleDeleteMenu={deleteMenu}
+              handleDeleteMenu={() => {
+                deleteMenu();
+                setSelectedId(null);
+              }}
               handleCloseModal={closeModal}
             />
           ) : null}

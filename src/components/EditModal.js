@@ -8,7 +8,7 @@ export default function EditModal({
   initialData,
 }) {
   const [name, setName] = useState(initialData.name);
-  const [price, setPrice] = useState(initialData.price);
+  const [price, setPrice] = useState(formatPrice(initialData.price));
   const [image, setImage] = useState(initialData.image);
   return (
     <Modal>
