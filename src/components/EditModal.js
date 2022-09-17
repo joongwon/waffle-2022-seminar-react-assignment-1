@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {formatPrice, priceToNum} from "../lib/formatting";
 import Modal from "./Modal";
 
 export default function EditModal({
@@ -24,7 +25,7 @@ export default function EditModal({
           <input
             id="price"
             value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            onChange={(e) => setPrice(formatPrice(e.target.value))}
           />
           <span className="input-suffix">원</span>
         </div>
@@ -39,7 +40,7 @@ export default function EditModal({
         <button
           className="green-button"
           onClick={() => {
-            handleUpdateMenu({ name, price: Number(price), image });
+            handleUpdateMenu({ name, price: priceToNum(price), image });
             handleCloseModal();
           }}
         >
