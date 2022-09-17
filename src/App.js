@@ -26,6 +26,7 @@ function App() {
   const [selectedId, setSelectedId] = useState(null);
 
   const selectedMenu = menus.find((menu) => menu.id === selectedId) ?? null;
+  const filteredMenus = menus.filter((menu) => menu.name.search(search) !== -1);
 
   function addMenu(newMenu) {
     setMenus([...menus, { ...newMenu, id: nextId }]);
@@ -57,7 +58,7 @@ function App() {
           </div>
           <div className="list-wrapper">
             <MenuList
-              menus={menus}
+              menus={filteredMenus}
               selectedId={selectedId}
               setSelectedId={setSelectedId}
             />
