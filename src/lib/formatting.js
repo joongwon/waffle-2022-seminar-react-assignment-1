@@ -1,4 +1,5 @@
 export function formatPrice(price) {
+  if (isNaN(price)) return "";
   const priceStr = price.toString().replaceAll(",", "");
   const slices = [];
   if (priceStr.length % 3 !== 0)

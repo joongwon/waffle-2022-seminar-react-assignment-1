@@ -1,7 +1,12 @@
 .header {
-    display: flex;
     border-bottom: solid 1px;
+    display: flex;
     align-items: center;
+}
+
+.header a {
+    text-decoration: none;
+    color: inherit;
 }
 
 .header img {

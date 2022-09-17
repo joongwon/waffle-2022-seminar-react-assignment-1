@@ -1,8 +1,12 @@
 import { useState } from "react";
-import {formatPrice, priceToNum} from "../lib/formatting";
+import { formatPrice, priceToNum } from "../lib/formatting";
 import Modal from "./Modal";
 
-export default function AddModal({ handleAddMenu, handleCloseModal }) {
+export default function AddModal({
+  handleAddMenu,
+  handleCloseModal,
+  validateMenu,
+}) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
@@ -36,8 +40,13 @@ export default function AddModal({ handleAddMenu, handleCloseModal }) {
         <button
           className="green-button"
           onClick={() => {
-            handleAddMenu({ name, price: priceToNum(price), image });
-            handleCloseModal();
+            const menu = { name, price: priceToNum(price), image };
+            const error = validateMenu(menu);
+            if (error) alert(error);
+            else {
+              handleAddMenu(menu);
+              handleCloseModal();
+            }
           }}
         >
           추가

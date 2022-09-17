@@ -28,6 +28,15 @@ function App() {
   const selectedMenu = menus.find((menu) => menu.id === selectedId) ?? null;
   const filteredMenus = menus.filter((menu) => menu.name.search(search) !== -1);
 
+  function validateMenu(menu, id) {
+    if (menu.price < 10 || menu.price > 100000)
+      return "가격은 10 ~ 100000 사이의 값을 입력하세요";
+
+    // id를 제외한 메뉴 중 menu.name이 존재
+    if (menus.some((item) => item.id !== id && item.name === menu.name))
+      return "같은 이름의 메뉴가 존재합니다";
+  }
+
   function addMenu(newMenu) {
     setMenus([...menus, { ...newMenu, id: nextId }]);
     setNextId(nextId + 1);
@@ -88,9 +97,14 @@ function App() {
           }}
         >
           {modal === MODAL_ADD ? (
-            <AddModal handleAddMenu={addMenu} handleCloseModal={closeModal} />
+            <AddModal
+              validateMenu={(menu) => validateMenu(menu, null)}
+              handleAddMenu={addMenu}
+              handleCloseModal={closeModal}
+            />
           ) : modal === MODAL_EDIT ? (
             <EditModal
+              validateMenu={(menu) => validateMenu(menu, selectedId)}
               handleUpdateMenu={updateMenu}
               handleCloseModal={closeModal}
               initialData={selectedMenu}

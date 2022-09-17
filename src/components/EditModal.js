@@ -1,10 +1,11 @@
 import { useState } from "react";
-import {formatPrice, priceToNum} from "../lib/formatting";
+import { formatPrice, priceToNum } from "../lib/formatting";
 import Modal from "./Modal";
 
 export default function EditModal({
   handleUpdateMenu,
   handleCloseModal,
+  validateMenu,
   initialData,
 }) {
   const [name, setName] = useState(initialData.name);
@@ -40,8 +41,13 @@ export default function EditModal({
         <button
           className="green-button"
           onClick={() => {
-            handleUpdateMenu({ name, price: priceToNum(price), image });
-            handleCloseModal();
+            const menu = { name, price: priceToNum(price), image };
+            const error = validateMenu(menu);
+            if (error) alert(error);
+            else {
+              handleUpdateMenu(menu);
+              handleCloseModal();
+            }
           }}
         >
           저장
