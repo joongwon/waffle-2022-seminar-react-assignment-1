@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { formatPrice, priceToNum } from "../lib/formatting";
-import Modal from "./Modal";
 
 export default function AddModal({
   handleAddMenu,
@@ -11,7 +10,7 @@ export default function AddModal({
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
   return (
-    <Modal>
+    <>
       <div className="modal-title">메뉴 추가</div>
       <div className="modal-form">
         <label htmlFor="name">이름</label>
@@ -53,6 +52,6 @@ export default function AddModal({
         </button>
         <button onClick={() => handleCloseModal()}>취소</button>
       </div>
-    </Modal>
+    </>
   );
 }

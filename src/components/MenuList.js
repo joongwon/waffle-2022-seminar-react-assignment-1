@@ -13,7 +13,9 @@ export default function MenuList({ menus, selectedId, setSelectedId }) {
         <MenuItem
           key={menu.id}
           menu={menu}
-          handleSelect={() => setSelectedId(menu.id)}
+          handleSelect={() =>
+            setSelectedId(selectedId === menu.id ? null : menu.id)
+          }
           selected={selectedId === menu.id}
         />
       ))}

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { formatPrice, priceToNum } from "../lib/formatting";
-import Modal from "./Modal";
 
 export default function EditModal({
   handleUpdateMenu,
@@ -12,7 +11,7 @@ export default function EditModal({
   const [price, setPrice] = useState(formatPrice(initialData.price));
   const [image, setImage] = useState(initialData.image);
   return (
-    <Modal>
+    <>
       <div className="modal-title">메뉴 수정</div>
       <div className="modal-form">
         <label htmlFor="name">이름</label>
@@ -54,6 +53,6 @@ export default function EditModal({
         </button>
         <button onClick={() => handleCloseModal()}>취소</button>
       </div>
-    </Modal>
+    </>
   );
 }
