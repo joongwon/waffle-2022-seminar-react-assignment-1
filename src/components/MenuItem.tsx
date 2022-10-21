@@ -1,7 +1,16 @@
 import { formatPrice } from "../lib/formatting";
 import "./MenuItem.css";
+import { Menu } from "../types/types";
 
-export default function MenuItem({ menu, selected, handleSelect }) {
+const MenuItem = ({
+  menu,
+  selected,
+  handleSelect,
+}: {
+  menu: Menu;
+  selected: boolean;
+  handleSelect(): void;
+}) => {
   const formattedPrice = formatPrice(menu.price);
   return (
     <li
@@ -13,4 +22,5 @@ export default function MenuItem({ menu, selected, handleSelect }) {
       <div>{formattedPrice}</div>
     </li>
   );
-}
+};
+export default MenuItem;

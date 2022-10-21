@@ -5,26 +5,20 @@ import { formatPrice } from "../lib/formatting";
 import styles from "./MenuDetails.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu } from "../types/types";
-import { useModal } from "./Modal";
+import { Modal, useModal } from "./Modal";
 import DeleteModal from "./DeleteModal";
 import { useMenuDataContext } from "../contexts/MenuDataContext";
+import { useCallback } from "react";
 
 export default function MenuDetails({ menu }: { menu: Menu }) {
   const formattedPrice = formatPrice(menu.price);
   const { deleteMenu } = useMenuDataContext();
   const navigate = useNavigate();
-  const { closeModal, openModal, modal } = useModal({
-    children: (
-      <DeleteModal
-        handleDeleteMenu={() => {
-          deleteMenu(menu.id);
-          navigate(`/stores/1`);
-        }}
-        handleCloseModal={() => closeModal()}
-      />
-    ),
-    onBackgroundClicked: () => closeModal(),
-  });
+  const modalHandle = useModal();
+  const onDelete = useCallback(() => {
+    deleteMenu(menu.id);
+    navigate(`/stores/1`);
+  }, [deleteMenu, menu.id, navigate]);
   return (
     <div className={styles["menu-details"]}>
       <div className={styles["info-container"]}>
@@ -39,12 +33,22 @@ export default function MenuDetails({ menu }: { menu: Menu }) {
           <Link to={`/menus/${menu.id}/edit`} className={styles["button"]}>
             <img src={editIcon} alt="수정" />
           </Link>
-          <button onClick={() => openModal()} className={styles["button"]}>
+          <button
+            onClick={() => modalHandle.openModal()}
+            className={styles["button"]}
+          >
             <img src={deleteIcon} alt="삭제" />
           </button>
         </div>
       </div>
-      {modal}
+      {
+        <Modal handle={modalHandle}>
+          <DeleteModal
+            handleDeleteMenu={onDelete}
+            handleCloseModal={modalHandle.closeModal}
+          />
+        </Modal>
+      }
     </div>
   );
 }
