@@ -1,6 +1,11 @@
-import {useState} from "react";
+import { useState } from "react";
 import initialData from "../data.json";
-import {MODAL_ADD, MODAL_DELETE, MODAL_EDIT, MODAL_NONE} from "../lib/modalTypes";
+import {
+  MODAL_ADD,
+  MODAL_DELETE,
+  MODAL_EDIT,
+  MODAL_NONE,
+} from "../lib/modalTypes";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import MenuList from "../components/MenuList";
@@ -9,7 +14,7 @@ import MenuDetails from "../components/MenuDetails";
 import AddModal from "../components/AddModal";
 import EditModal from "../components/EditModal";
 import DeleteModal from "../components/DeleteModal";
-import {Menu} from "../types/types";
+import { Menu } from "../types/types";
 
 function App() {
   const [nextId, setNextId] = useState(100);
@@ -35,7 +40,7 @@ function App() {
   }
 
   function addMenuAndSelect(newMenu: Menu) {
-    const addedMenu = {...newMenu, id: nextId};
+    const addedMenu = { ...newMenu, id: nextId };
     setMenus([...menus, addedMenu]);
     setSelectedId(addedMenu.id);
     setNextId(nextId + 1);
@@ -43,7 +48,7 @@ function App() {
 
   function updateMenu(editedMenu: Menu) {
     const newMenus = menus.map((menu) =>
-      menu.id === selectedId ? {...editedMenu, id: selectedId} : menu
+      menu.id === selectedId ? { ...editedMenu, id: selectedId } : menu
     );
     setMenus(newMenus);
   }
@@ -63,10 +68,10 @@ function App() {
   return (
     <>
       <div className="app">
-        <Header/>
+        <Header />
         <div className={`container ${selectedId !== null ? "selected" : ""}`}>
           <div className="search-wrapper">
-            <SearchBar search={search} setSearch={setSearch}/>
+            <SearchBar search={search} setSearch={setSearch} />
           </div>
           <div className="list-wrapper">
             <MenuList
@@ -78,7 +83,7 @@ function App() {
               className="open-add-modal"
               onClick={() => setModal(MODAL_ADD)}
             >
-              <img src={addIcon} alt="새 메뉴"/>
+              <img src={addIcon} alt="새 메뉴" />
             </button>
           </div>
           {selectedMenu && (

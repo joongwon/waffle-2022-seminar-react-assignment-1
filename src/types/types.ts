@@ -1,8 +1,8 @@
 export enum MenuType {
-  waffle= "waffle",
+  waffle = "waffle",
   beverage = "beverage",
   coffee = "coffee",
-  dessert = "dessert"
+  dessert = "dessert",
 }
 
 export type Menu = {
@@ -12,4 +12,4 @@ export type Menu = {
   price: number;
   image?: string;
   description?: string;
-}
+};
