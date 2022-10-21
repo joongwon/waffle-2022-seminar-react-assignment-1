@@ -1,11 +1,4 @@
-.app {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.app > .container {
+.container {
   flex: 1;
   display: grid;
   grid-template-rows: auto 1fr;
@@ -14,19 +7,19 @@
   padding: 20px;
 }
 
-.app > .container.selected {
+.container.selected {
   grid-template-columns: 2fr 1fr;
 }
 
-.app > .container > .details-wrapper {
+.details-wrapper {
   grid-row: 1 / 3;
 }
 
-.app > .container > .list-wrapper {
+.list-wrapper {
   position: relative;
 }
 
-.app > .container .open-add-modal {
+.container .open-add-modal {
   position: absolute;
   bottom: 30px;
   right: 30px;

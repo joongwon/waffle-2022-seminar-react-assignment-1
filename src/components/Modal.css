@@ -23,10 +23,6 @@
     transition: 300ms;
 }
 
-.modal-container.closed {
-    display: none;
-}
-
 .modal {
     background: #fff;
     border-radius: 10px;

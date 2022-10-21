@@ -13,3 +13,7 @@ export function priceToNum(price: string): number {
   console.log(price, "=>", Number(price.replaceAll(",", "")));
   return Number(price.replaceAll(",", ""));
 }
+
+export function nanToNull(n: number): number | null {
+  return isNaN(n) ? null : n;
+}

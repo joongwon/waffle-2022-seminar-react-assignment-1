@@ -1,11 +1,17 @@
 import searchIcon from "../resources/search-icon.svg";
-import "./SearchBar.css";
+import styles from "./SearchBar.module.css";
 
-export default function SearchBar({ search, setSearch }) {
+export default function SearchBar({
+  search,
+  setSearch,
+}: {
+  search: string;
+  setSearch: (value: string) => void;
+}) {
   return (
-    <div className="search-bar">
+    <div className={styles["search-bar"]}>
       <label>이름 검색:</label>
-      <div className="input-container">
+      <div className={styles["input-container"]}>
         <input
           placeholder="검색어 입력"
           value={search}

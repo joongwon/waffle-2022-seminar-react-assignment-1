@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./Modal.css";
 
 export function useModal({
@@ -14,16 +14,19 @@ export function useModal({
   const openModal = useCallback(() => {
     setState("open");
   }, []);
+  const timeoutId = useRef<number>();
   const closeModal = useCallback(() => {
     console.log("closing");
     setState("closing");
-    setTimeout(() => {
+    timeoutId.current = window.setTimeout(() => {
       console.log("closed");
       setState("closed");
       afterClosed();
     }, 300);
   }, [afterClosed]);
-  const modal = (
+  // clean up timeout on unmount
+  useEffect(() => () => window.clearTimeout(timeoutId.current));
+  const modal = state !== "closed" && (
     <div
       className={`modal-container ${state}`}
       onClick={() => {

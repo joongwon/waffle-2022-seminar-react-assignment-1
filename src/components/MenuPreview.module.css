@@ -1,4 +1,4 @@
-.menu-details {
+.menu-preview {
   border-radius: 10px;
   border: #000 solid 1px;
   width: 100%;
@@ -7,9 +7,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
 }
 
-.menu-details > .close-button {
+.close-button {
   background: none;
   border: none;
   position: absolute;
@@ -17,34 +18,34 @@
   right: 10px;
 }
 
-.menu-details > .info-container {
+.info-container {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.menu-details > .info-container > h3 {
+.info-container > h3 {
   font-size: 20px;
   margin: 0;
 }
 
-.menu-details > .info-container > p {
+.info-container > p {
   font-size: 12px;
   margin: 0;
 }
 
-.menu-details > .info-container > .buttons-container {
-  padding-top: 30px;
-}
-
-.menu-details > .info-container > .buttons-container button {
-  background: none;
-  border: none;
-}
-
-.menu-details > .info-container > img {
+.info-container > img {
   width: 200px;
   height: 200px;
   border: 1px solid #d9d9d9;
   border-radius: 50px;
+}
+
+.link-details {
+  text-decoration: inherit;
+  color: inherit;
+  border: solid 1px;
+  border-radius: 7px;
+  padding: 2px 5px;
+  margin-top: 10px;
 }
