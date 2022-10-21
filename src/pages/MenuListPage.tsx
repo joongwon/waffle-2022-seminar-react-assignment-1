@@ -1,35 +1,29 @@
-import "./App.css";
-import { useState } from "react";
-import Header from "./components/Header";
-import SearchBar from "./components/SearchBar";
-import MenuList from "./components/MenuList";
-import addIcon from "./resources/add-icon.svg";
-
-import initialData from "./data.json";
-import MenuDetails from "./components/MenuDetails";
-import {
-  MODAL_ADD,
-  MODAL_DELETE,
-  MODAL_EDIT,
-  MODAL_NONE,
-} from "./lib/modalTypes";
-import AddModal from "./components/AddModal";
-import EditModal from "./components/EditModal";
-import DeleteModal from "./components/DeleteModal";
+import {useState} from "react";
+import initialData from "../data.json";
+import {MODAL_ADD, MODAL_DELETE, MODAL_EDIT, MODAL_NONE} from "../lib/modalTypes";
+import Header from "../components/Header";
+import SearchBar from "../components/SearchBar";
+import MenuList from "../components/MenuList";
+import addIcon from "../resources/add-icon.svg";
+import MenuDetails from "../components/MenuDetails";
+import AddModal from "../components/AddModal";
+import EditModal from "../components/EditModal";
+import DeleteModal from "../components/DeleteModal";
+import {Menu} from "../types/types";
 
 function App() {
   const [nextId, setNextId] = useState(100);
-  const [menus, setMenus] = useState(initialData);
+  const [menus, setMenus] = useState<Menu[]>(initialData as Menu[]);
 
   const [search, setSearch] = useState("");
   const [modal, setModal] = useState(MODAL_NONE);
   const [modalClosing, setModalClosing] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const selectedMenu = menus.find((menu) => menu.id === selectedId) ?? null;
   const filteredMenus = menus.filter((menu) => menu.name.search(search) !== -1);
 
-  function validateMenu(menu, id) {
+  function validateMenu(menu: Menu, id: number | null) {
     if (menu.price < 10 || menu.price > 100000)
       return "가격은 10 ~ 100000 사이의 값을 입력하세요";
 
@@ -40,16 +34,16 @@ function App() {
       return "같은 이름의 메뉴가 존재합니다";
   }
 
-  function addMenuAndSelect(newMenu) {
-    const addedMenu = { ...newMenu, id: nextId };
+  function addMenuAndSelect(newMenu: Menu) {
+    const addedMenu = {...newMenu, id: nextId};
     setMenus([...menus, addedMenu]);
     setSelectedId(addedMenu.id);
     setNextId(nextId + 1);
   }
 
-  function updateMenu(editedMenu) {
+  function updateMenu(editedMenu: Menu) {
     const newMenus = menus.map((menu) =>
-      menu.id === selectedId ? { ...editedMenu, id: selectedId } : menu
+      menu.id === selectedId ? {...editedMenu, id: selectedId} : menu
     );
     setMenus(newMenus);
   }
@@ -69,10 +63,10 @@ function App() {
   return (
     <>
       <div className="app">
-        <Header />
+        <Header/>
         <div className={`container ${selectedId !== null ? "selected" : ""}`}>
           <div className="search-wrapper">
-            <SearchBar search={search} setSearch={setSearch} />
+            <SearchBar search={search} setSearch={setSearch}/>
           </div>
           <div className="list-wrapper">
             <MenuList
@@ -84,7 +78,7 @@ function App() {
               className="open-add-modal"
               onClick={() => setModal(MODAL_ADD)}
             >
-              <img src={addIcon} alt="새 메뉴" />
+              <img src={addIcon} alt="새 메뉴"/>
             </button>
           </div>
           {selectedMenu && (
@@ -107,13 +101,13 @@ function App() {
         >
           {modal === MODAL_ADD ? (
             <AddModal
-              validateMenu={(menu) => validateMenu(menu, null)}
+              validateMenu={(menu: Menu) => validateMenu(menu, null)}
               handleAddMenu={addMenuAndSelect}
               handleCloseModal={closeModal}
             />
           ) : modal === MODAL_EDIT ? (
             <EditModal
-              validateMenu={(menu) => validateMenu(menu, selectedId)}
+              validateMenu={(menu: Menu) => validateMenu(menu, selectedId)}
               handleUpdateMenu={updateMenu}
               handleCloseModal={closeModal}
               initialData={selectedMenu}
