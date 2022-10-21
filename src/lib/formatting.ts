@@ -1,8 +1,4 @@
-/**
- * @param price {number}
- * @returns {string}
- */
-export function formatPrice(price) {
+export function formatPrice(price: number): string {
   if (isNaN(price)) return "";
   const priceStr = price.toString().replaceAll(",", "");
   const slices = [];
@@ -14,11 +10,7 @@ export function formatPrice(price) {
   return slices.join(",");
 }
 
-/**
- * @param price {string}
- * @returns {number}
- */
-export function priceToNum(price) {
+export function priceToNum(price: string): number {
   console.log(price, "=>", Number(price.replaceAll(",", "")));
   return Number(price.replaceAll(",", ""));
 }
