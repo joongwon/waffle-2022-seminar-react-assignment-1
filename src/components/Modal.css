@@ -23,6 +23,10 @@
     transition: 300ms;
 }
 
+.modal-container.closing * {
+    pointer-events: none;
+}
+
 .modal {
     background: #fff;
     border-radius: 10px;

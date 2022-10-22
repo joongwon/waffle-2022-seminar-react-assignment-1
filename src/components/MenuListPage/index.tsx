@@ -47,14 +47,20 @@ function MenuListPage() {
             <img src={addIcon} alt="새 메뉴" />
           </Link>
         </div>
-        {selectedMenu && (
-          <div className={styles["details-wrapper"]}>
+        <div
+          className={`${styles["details-wrapper"]} ${
+            selectedId ? "" : styles["closed"]
+          }`}
+        >
+          {selectedMenu && (
             <MenuPreview
               menu={selectedMenu}
-              onClosePreview={() => setSelectedId(null)}
+              onClosePreview={() => {
+                setSelectedId(null);
+              }}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );
