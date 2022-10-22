@@ -1,6 +1,6 @@
 import MenuItem from "./MenuItem";
 import "./MenuList.css";
-import { Menu } from "../types/types";
+import { Menu } from "../../types/types";
 
 const MenuList = ({
   menus,

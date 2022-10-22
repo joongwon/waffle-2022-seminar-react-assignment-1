@@ -1,9 +1,9 @@
-import closeIcon from "../resources/close-icon.svg";
-import imagePlaceholder from "../resources/image-placeholder.png";
-import { formatPrice } from "../lib/formatting";
+import closeIcon from "../../resources/close-icon.svg";
+import imagePlaceholder from "../../resources/image-placeholder.png";
+import { formatPrice } from "../../lib/formatting";
 import styles from "./MenuPreview.module.css";
 import { Link } from "react-router-dom";
-import { Menu } from "../types/types";
+import { Menu } from "../../types/types";
 
 export default function MenuPreview({
   menu,

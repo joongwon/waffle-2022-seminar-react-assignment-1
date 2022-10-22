@@ -12,6 +12,11 @@ code {
     monospace;
 }
 
+a {
+  text-decoration: inherit;
+  color: inherit;
+}
+
 button {
   cursor: pointer;
 }

@@ -1,4 +1,4 @@
-import searchIcon from "../resources/search-icon.svg";
+import searchIcon from "../../resources/search-icon.svg";
 import styles from "./SearchBar.module.css";
 
 export default function SearchBar({

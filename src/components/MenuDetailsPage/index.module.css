@@ -12,3 +12,8 @@
     border: solid 1px;
     border-radius: 10px;
 }
+
+.back-link {
+    display: flex;
+    align-items: center;
+}

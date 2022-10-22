@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
-import SearchBar from "../components/SearchBar";
-import MenuList from "../components/MenuList";
-import addIcon from "../resources/add-icon.svg";
-import MenuPreview from "../components/MenuPreview";
-import { useMenuDataContext } from "../contexts/MenuDataContext";
+import SearchBar from "./SearchBar";
+import MenuList from "./MenuList";
+import addIcon from "../../resources/add-icon.svg";
+import MenuPreview from "./MenuPreview";
+import { useMenuDataContext } from "../../contexts/MenuDataContext";
 import { Link, useSearchParams } from "react-router-dom";
-import styles from "./MenuListPage.module.css";
-import { nanToNull } from "../lib/formatting";
+import styles from "./index.module.css";
+import { nanToNull } from "../../lib/formatting";
 
 function MenuListPage() {
   const [search, setSearch] = useState("");

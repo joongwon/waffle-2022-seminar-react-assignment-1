@@ -1,13 +1,13 @@
-import imagePlaceholder from "../resources/image-placeholder.png";
-import editIcon from "../resources/edit-icon.svg";
-import deleteIcon from "../resources/delete-icon.svg";
-import { formatPrice } from "../lib/formatting";
+import imagePlaceholder from "../../resources/image-placeholder.png";
+import editIcon from "../../resources/edit-icon.svg";
+import deleteIcon from "../../resources/delete-icon.svg";
+import { formatPrice } from "../../lib/formatting";
 import styles from "./MenuDetails.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu } from "../types/types";
-import { Modal, useModal } from "./Modal";
+import { Menu } from "../../types/types";
+import { Modal, useModal } from "../Modal";
 import DeleteModal from "./DeleteModal";
-import { useMenuDataContext } from "../contexts/MenuDataContext";
+import { useMenuDataContext } from "../../contexts/MenuDataContext";
 import { useCallback } from "react";
 
 export default function MenuDetails({ menu }: { menu: Menu }) {
