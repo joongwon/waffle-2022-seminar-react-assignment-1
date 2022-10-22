@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import MenuDetails from "./MenuDetails";
 import ArrowBackIcon from "../../resources/arrow-back-icon.svg";
 
-export default function () {
+export default function MenuDetailsPage() {
   const { getMenuById } = useMenuDataContext();
   const menuId = Number(useParams().menuId);
   const menu = useMemo(() => getMenuById(menuId), [getMenuById, menuId]);
