@@ -9,11 +9,22 @@ export function formatPrice(price: number): string {
   return slices.join(",");
 }
 
-export function priceToNum(price: string): number {
-  console.log(price, "=>", Number(price.replaceAll(",", "")));
-  return Number(price.replaceAll(",", ""));
+export function priceToNum(price: string): number | null {
+  const n = Number(price.replaceAll(",", ""));
+  if (isNaN(n)) return null;
+  if (n < 0) return null;
+  if (n > 1000000) return null;
+  return n;
 }
 
 export function nanToNull(n: number): number | null {
   return isNaN(n) ? null : n;
+}
+
+export function emptyToU(s: string): string | undefined {
+  return s === "" ? undefined : s;
+}
+
+export function uToEmpty(s?: string): string {
+  return s ?? "";
 }
