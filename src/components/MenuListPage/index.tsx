@@ -19,7 +19,7 @@ function MenuListPage() {
   const { getMenuById, filterMenus } = useMenuDataContext();
 
   const selectedMenu = useMemo(
-    () => selectedId !== null && getMenuById(selectedId),
+    () => (selectedId !== null ? getMenuById(selectedId) : null),
     [getMenuById, selectedId]
   );
   const filteredMenus = useMemo(
@@ -52,14 +52,12 @@ function MenuListPage() {
             selectedId ? "" : styles["closed"]
           }`}
         >
-          {selectedMenu && (
-            <MenuPreview
-              menu={selectedMenu}
-              onClosePreview={() => {
-                setSelectedId(null);
-              }}
-            />
-          )}
+          <MenuPreview
+            menu={selectedMenu}
+            onClosePreview={() => {
+              setSelectedId(null);
+            }}
+          />
         </div>
       </div>
     </>

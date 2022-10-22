@@ -23,7 +23,7 @@ export default function MenuDetails({ menu }: { menu: Menu }) {
     <div className={styles["menu-details"]}>
       <div className={styles["info-container"]}>
         <img
-          src={menu.image !== "" ? menu.image : imagePlaceholder}
+          src={menu.image ? menu.image : imagePlaceholder}
           alt="상품 이미지"
         />
         <h3>{menu.name}</h3>

@@ -3,17 +3,13 @@
     "id": 1,
     "name": "초코와플",
     "price": 7000,
-    "image": "",
-    "type": "waffle",
-    "description": ""
+    "type": "waffle"
   },
   {
     "id": 2,
     "name": "아메리카노",
     "price": 4000,
-    "image": "",
-    "type": "coffee",
-    "description": ""
+    "type": "coffee"
   },
   {
     "id": 3,
@@ -28,7 +24,6 @@
     "name": "딸기와플",
     "price": 7000,
     "image": "https://upload.wikimedia.org/wikipedia/commons/2/29/PerfectStrawberry.jpg",
-    "type": "waffle",
-    "description": ""
+    "type": "waffle"
   }
 ]

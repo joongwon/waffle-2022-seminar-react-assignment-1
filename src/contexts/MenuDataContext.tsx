@@ -74,6 +74,7 @@ export function MenuDataProvider({ children }: { children?: any }) {
       return menuInstance;
 
       function validateMenu(menu: MenuCreateInput, id: number | null) {
+        if (menu.name.trim() === "") return "이름을 입력하세요";
         if (menu.price < 10 || menu.price > 100000)
           return "가격은 10 ~ 100000 사이의 값을 입력하세요";
 

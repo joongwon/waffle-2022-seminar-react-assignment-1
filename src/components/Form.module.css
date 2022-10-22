@@ -21,7 +21,7 @@
     font-size: 15px;
     font-weight: bold;
 }
-.form input, .form textarea {
+.form input, .form textarea, .form select {
     border: solid 1px black;
     background: #FFF;
     color: #000;

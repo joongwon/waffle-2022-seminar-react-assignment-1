@@ -30,13 +30,20 @@ type InputWithLabelArgs<T, N extends keyof T> = {
   label: string;
   name: N;
   setValue: (value: T) => void;
-  propToString: T[N] extends string
-    ? ((prop: T[N]) => string) | undefined
-    : (prop: T[N]) => string;
-  stringToProp: string extends T[N]
-    ? ((prop: string) => T[N]) | undefined
-    : (prop: string) => T[N];
-};
+} & (T[N] extends string
+  ? {
+      propToString?: (prop: T[N]) => string;
+    }
+  : {
+      propToString: (prop: T[N]) => string;
+    }) &
+  (T[N] extends string
+    ? {
+        stringToProp?: (prop: string) => T[N];
+      }
+    : {
+        stringToProp: (prop: string) => T[N];
+      });
 
 export function InputWithLabel<T, N extends keyof T>({
   value,
