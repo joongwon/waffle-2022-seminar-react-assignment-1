@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import initialData from "../data.json";
-import { Menu, MenuCreateInput, MenuUpdateInput } from "../types/types";
+import { Menu, MenuCreateInput, MenuUpdateInput } from "../lib/types";
 
 type MenuDataContextValue = {
   menus: Menu[];

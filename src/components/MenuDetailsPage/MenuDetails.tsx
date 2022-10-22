@@ -4,7 +4,7 @@ import deleteIcon from "../../resources/delete-icon.svg";
 import { formatPrice } from "../../lib/formatting";
 import styles from "./MenuDetails.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu } from "../../types/types";
+import { Menu } from "../../lib/types";
 import { Modal, useModal } from "../Modal";
 import DeleteModal from "./DeleteModal";
 import { useMenuDataContext } from "../../contexts/MenuDataContext";

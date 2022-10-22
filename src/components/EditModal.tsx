@@ -7,7 +7,7 @@ import {
   ModalInputSuffix,
   ModalTitle,
 } from "./Modal";
-import { Menu, MenuUpdateInput } from "../types/types";
+import { Menu, MenuUpdateInput } from "../lib/types";
 
 export default function EditModal({
   handleUpdateMenu,

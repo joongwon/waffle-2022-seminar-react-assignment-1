@@ -1,6 +1,6 @@
 import { formatPrice } from "../../lib/formatting";
 import "./MenuItem.css";
-import { Menu } from "../../types/types";
+import { Menu } from "../../lib/types";
 
 const MenuItem = ({
   menu,

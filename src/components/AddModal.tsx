@@ -7,7 +7,7 @@ import {
   ModalInputSuffix,
   ModalTitle,
 } from "./Modal";
-import { MenuCreateInput, MenuType } from "../types/types";
+import { MenuCreateInput, MenuType } from "../lib/types";
 
 export default function AddModal({
   handleAddMenu,
