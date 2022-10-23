@@ -9,8 +9,7 @@ export default function MenuDetailsPage() {
   const { getMenuById } = useMenuDataContext();
   const menuId = Number(useParams().menuId);
   const menu = useMemo(() => getMenuById(menuId), [getMenuById, menuId]);
-  if (!menu) throw new Error("존재하지 않는 메뉴입니다");
-  return (
+  return menu ? (
     <div className={styles["container"]}>
       <Link to={`/stores/1?menu=${menuId}`} className={styles["back-link"]}>
         <img src={ArrowBackIcon} alt="" width="32px" />
@@ -19,5 +18,7 @@ export default function MenuDetailsPage() {
       <MenuDetails menu={menu} />
       <div className={styles["review-container"]} />
     </div>
+  ) : (
+    <div>존재하지 않는 메뉴입니다</div>
   );
 }

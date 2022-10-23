@@ -17,7 +17,7 @@ export default function LoginPage() {
         className={styles["form"]}
         onSubmit={(e) => {
           e.preventDefault();
-          if (loginForm.username === "") throw new Error("empty user name");
+          if (loginForm.username === "") alert("ID를 입력하세요!");
           login(loginForm.username);
           navigate("/");
         }}

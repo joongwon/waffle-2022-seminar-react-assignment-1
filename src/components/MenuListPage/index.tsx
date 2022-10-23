@@ -7,11 +7,13 @@ import { useMenuDataContext } from "../../contexts/MenuDataContext";
 import { Link, useSearchParams } from "react-router-dom";
 import styles from "./index.module.css";
 import { nanToNull } from "../../lib/formatting";
+import { useSessionContext } from "../../contexts/SessionContext";
 
 function MenuListPage() {
   const [search, setSearch] = useState("");
-  const [params, setParams] = useSearchParams();
-  const selectedId = nanToNull(Number(params.get("menu")));
+  const [searchParams, setParams] = useSearchParams();
+  const selectedId = nanToNull(Number(searchParams.get("menu")));
+  const { user } = useSessionContext();
   function setSelectedId(n: number | null) {
     if (n === null) setParams({});
     else setParams({ menu: n.toString() });
@@ -43,9 +45,11 @@ function MenuListPage() {
             selectedId={selectedId}
             setSelectedId={setSelectedId}
           />
-          <Link to="/menus/new" className={styles["open-add-modal"]}>
-            <img src={addIcon} alt="새 메뉴" />
-          </Link>
+          {user && (
+            <Link to="/menus/new" className={styles["open-add-modal"]}>
+              <img src={addIcon} alt="새 메뉴" />
+            </Link>
+          )}
         </div>
         <div
           className={`${styles["details-wrapper"]} ${

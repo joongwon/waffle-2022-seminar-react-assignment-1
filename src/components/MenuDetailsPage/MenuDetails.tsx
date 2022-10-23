@@ -9,6 +9,7 @@ import { Modal, useModal } from "../Modal";
 import DeleteModal from "./DeleteModal";
 import { useMenuDataContext } from "../../contexts/MenuDataContext";
 import { useCallback } from "react";
+import { useSessionContext } from "../../contexts/SessionContext";
 
 export default function MenuDetails({ menu }: { menu: Menu }) {
   const formattedPrice = formatPrice(menu.price);
@@ -19,6 +20,7 @@ export default function MenuDetails({ menu }: { menu: Menu }) {
     deleteMenu(menu.id);
     navigate(`/stores/1`);
   }, [deleteMenu, menu.id, navigate]);
+  const { user } = useSessionContext();
   return (
     <div className={styles["menu-details"]}>
       <div className={styles["info-container"]}>
@@ -29,17 +31,19 @@ export default function MenuDetails({ menu }: { menu: Menu }) {
         <h3>{menu.name}</h3>
         <p>{formattedPrice}원</p>
         <p>{menu.description}</p>
-        <div className={styles["buttons-container"]}>
-          <Link to={`/menus/${menu.id}/edit`} className={styles["button"]}>
-            <img src={editIcon} alt="수정" />
-          </Link>
-          <button
-            onClick={() => modalHandle.openModal()}
-            className={styles["button"]}
-          >
-            <img src={deleteIcon} alt="삭제" />
-          </button>
-        </div>
+        {user && (
+          <div className={styles["buttons-container"]}>
+            <Link to={`/menus/${menu.id}/edit`} className={styles["button"]}>
+              <img src={editIcon} alt="수정" />
+            </Link>
+            <button
+              onClick={() => modalHandle.openModal()}
+              className={styles["button"]}
+            >
+              <img src={deleteIcon} alt="삭제" />
+            </button>
+          </div>
+        )}
       </div>
       {
         <Modal handle={modalHandle}>

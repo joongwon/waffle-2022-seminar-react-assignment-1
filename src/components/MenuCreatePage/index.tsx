@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMenuDataContext } from "../../contexts/MenuDataContext";
 import {
@@ -11,9 +11,11 @@ import { displayType, MenuCreateInput, MenuType } from "../../lib/types";
 import { ButtonContainer } from "../ButtonContainer";
 import { Form, InputWithLabel } from "../Form";
 import styles from "./index.module.css";
+import { useSessionContext } from "../../contexts/SessionContext";
 
 export default function MenuEditPage() {
   const { addMenu } = useMenuDataContext();
+  const { user } = useSessionContext();
   const [menu, setMenu] = useState<
     Omit<MenuCreateInput, "price"> & { price: number | null }
   >({
@@ -22,6 +24,15 @@ export default function MenuEditPage() {
     name: "",
   });
   const navigate = useNavigate();
+  const dead = useRef(false);
+  useEffect(() => {
+    if (dead.current) return;
+    if (!user) {
+      alert("메뉴를 수정하려면 로그인하세요");
+      navigate("/auth/login", { replace: true });
+      dead.current = true;
+    }
+  }, [dead, navigate, user]);
   const id = useId();
   return (
     <div className={styles["container"]}>

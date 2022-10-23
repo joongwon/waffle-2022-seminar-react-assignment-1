@@ -5,7 +5,6 @@ import { useSessionContext } from "../contexts/SessionContext";
 
 export default function Layout() {
   const { user, logout } = useSessionContext();
-  console.log(user);
   return (
     <div className={styles.app}>
       <header className={styles.header}>
