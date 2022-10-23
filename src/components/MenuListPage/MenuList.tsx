@@ -13,6 +13,7 @@ const MenuList = ({ menus, selectedId, setSelectedId }: MenuListProps) => (
     <li className="list-header">
       <div>ID</div>
       <div>이름</div>
+      <div>종류</div>
       <div>가격</div>
     </li>
     {menus.map((menu) => (

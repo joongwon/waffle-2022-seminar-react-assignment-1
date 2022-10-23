@@ -4,7 +4,7 @@ import deleteIcon from "../../resources/delete-icon.svg";
 import { formatPrice } from "../../lib/formatting";
 import styles from "./MenuDetails.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu } from "../../lib/types";
+import { displayType, Menu } from "../../lib/types";
 import { Modal, useModal } from "../Modal";
 import DeleteModal from "./DeleteModal";
 import { useMenuDataContext } from "../../contexts/MenuDataContext";
@@ -32,6 +32,7 @@ export default function MenuDetails({ menu }: MenuDetailsProps) {
         />
         <h3>{menu.name}</h3>
         <p>{formattedPrice}원</p>
+        <p>{displayType(menu.type)}</p>
         <p>{menu.description}</p>
         {user && (
           <div className={styles["buttons-container"]}>

@@ -4,7 +4,7 @@ import imagePlaceholder from "../../resources/image-placeholder.png";
 import { formatPrice } from "../../lib/formatting";
 import styles from "./MenuPreview.module.css";
 import { Link } from "react-router-dom";
-import { Menu } from "../../lib/types";
+import { displayType, Menu } from "../../lib/types";
 
 interface MenuPreviewProps {
   menu: Menu | null;
@@ -43,6 +43,7 @@ export default function MenuPreview({
           />
           <h3>{menu.name}</h3>
           <p>{formatPrice(menu.price)}원</p>
+          <p>{displayType(menu.type)}</p>
           <Link className={styles["link-details"]} to={`/menus/${menu.id}`}>
             자세히 보기
           </Link>

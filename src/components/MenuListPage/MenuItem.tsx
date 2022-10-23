@@ -1,6 +1,6 @@
 import { formatPrice } from "../../lib/formatting";
-import "./MenuItem.css";
-import { Menu } from "../../lib/types";
+import styles from "./MenuItem.module.css";
+import { displayType, Menu } from "../../lib/types";
 
 interface MenuItemProps {
   menu: Menu;
@@ -12,11 +12,12 @@ const MenuItem = ({ menu, selected, handleSelect }: MenuItemProps) => {
   const formattedPrice = formatPrice(menu.price);
   return (
     <li
-      className={`menu-item ${selected ? "selected" : ""}`}
+      className={`${styles["menu-item"]} ${selected ? styles["selected"] : ""}`}
       onClick={handleSelect}
     >
       <div>{menu.id}</div>
       <div>{menu.name}</div>
+      <div>{displayType(menu.type)}</div>
       <div>{formattedPrice}</div>
     </li>
   );
