@@ -58,6 +58,8 @@ export default function MenuEditPage() {
           setValue={setMenu}
           stringToProp={(s) => (s === "" ? null : priceToNum(s) ?? menu.price)}
           propToString={(p) => (p === null ? "" : formatPrice(p))}
+          placeholder="5,000"
+          suffix="원"
         />
         <InputWithLabel
           textarea
@@ -67,6 +69,7 @@ export default function MenuEditPage() {
           name="description"
           stringToProp={emptyToU}
           propToString={uToEmpty}
+          placeholder="설명을 입력하세요"
         />
         <InputWithLabel
           value={menu}
@@ -75,6 +78,7 @@ export default function MenuEditPage() {
           setValue={setMenu}
           stringToProp={emptyToU}
           propToString={uToEmpty}
+          placeholder="https://example.com/foo.png"
         />
       </Form>
       <ButtonContainer>

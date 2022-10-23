@@ -13,14 +13,17 @@ import { Form, InputWithLabel } from "../Form";
 import styles from "./index.module.css";
 import { useSessionContext } from "../../contexts/SessionContext";
 
-type MenuForm = Omit<MenuCreateInput, "price"> & { price: number | null };
+type MenuForm = Omit<MenuCreateInput, "price" | "type"> & {
+  price: number | null;
+  type: MenuType | null;
+};
 
 export default function MenuEditPage() {
   const { addMenu } = useMenuDataContext();
   const { user } = useSessionContext();
   const [menu, setMenu] = useState<MenuForm>({
     price: null,
-    type: MenuType.waffle,
+    type: null,
     name: "",
   });
   const navigate = useNavigate();
@@ -43,14 +46,22 @@ export default function MenuEditPage() {
           label="이름"
           name="name"
           setValue={setMenu}
+          placeholder="맛있는와플"
         />
         <label htmlFor={id}>종류</label>
         <select
           onChange={(e) =>
-            setMenu({ ...menu, type: e.target.value as MenuType })
+            setMenu({
+              ...menu,
+              type: e.target.value === "" ? null : (e.target.value as MenuType),
+            })
           }
-          value={menu.type}
+          value={menu.type ?? ""}
+          required
         >
+          <option value="" disabled>
+            메뉴의 종류를 선택하세요
+          </option>
           {Object.values(MenuType).map((v) => (
             <option value={v} key={v}>
               {displayType(v as MenuType)}
@@ -64,6 +75,8 @@ export default function MenuEditPage() {
           setValue={setMenu}
           stringToProp={(s) => (s === "" ? null : priceToNum(s) ?? menu.price)}
           propToString={(p) => (p === null ? "" : formatPrice(p))}
+          placeholder="9,000"
+          suffix="원"
         />
         <InputWithLabel
           textarea
@@ -73,6 +86,7 @@ export default function MenuEditPage() {
           name="description"
           stringToProp={emptyToU}
           propToString={uToEmpty}
+          placeholder="설명을 입력하세요"
         />
         <InputWithLabel
           value={menu}
@@ -81,17 +95,21 @@ export default function MenuEditPage() {
           setValue={setMenu}
           stringToProp={emptyToU}
           propToString={uToEmpty}
+          placeholder="https://example.com/foo.png"
         />
       </Form>
       <ButtonContainer>
         <button
           onClick={() => {
-            const price = menu.price;
+            const { price, type } = menu;
             if (price === null) {
               alert("invalid price");
               return;
+            } else if (type === null) {
+              alert("invalid type");
+              return;
             }
-            const newMenu = addMenu({ ...menu, price });
+            const newMenu = addMenu({ ...menu, price, type });
             navigate(`/menus/${newMenu.id}`);
           }}
           className={styles["green"]}

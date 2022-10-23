@@ -41,6 +41,7 @@ export function InputWithLabel<T, N extends keyof T>({
   propToString,
   stringToProp,
   textarea,
+  suffix,
   ...rest
 }: InputWithLabelProps<T, N>) {
   const pts = propToString ?? ((x: string) => x);
@@ -59,14 +60,17 @@ export function InputWithLabel<T, N extends keyof T>({
           {...rest}
         />
       ) : (
-        <input
-          id={id}
-          onChange={(e) => {
-            setValue({ ...value, [name]: stp(e.target.value) });
-          }}
-          value={pts(value[name])}
-          {...rest}
-        />
+        <div className={styles["suffix-container"]}>
+          <input
+            id={id}
+            onChange={(e) => {
+              setValue({ ...value, [name]: stp(e.target.value) });
+            }}
+            value={pts(value[name])}
+            {...rest}
+          />
+          <span className={styles["suffix"]}>{suffix}</span>
+        </div>
       )}
     </>
   );

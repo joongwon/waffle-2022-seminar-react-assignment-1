@@ -39,7 +39,25 @@
 .form textarea {
     resize: none;
     height: 70px;
+    font-family: inherit;
 }
 .form input[disabled] {
     border: none;
+}
+.form select:invalid {
+    color: #888;
+}
+.suffix-container {
+    position: relative;
+}
+.suffix-container input {
+    width: 100%;
+}
+.suffix-container .suffix {
+    position: absolute;
+    right: 1ch;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
 }

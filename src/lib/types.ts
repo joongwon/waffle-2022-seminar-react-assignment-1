@@ -66,10 +66,10 @@ export type InputWithLabelProps<T, N extends keyof T> = (
   | (Omit<
       InputHTMLAttributes<HTMLInputElement>,
       keyof InputWithLabelArgsBase<T, N>
-    > & { textarea?: false })
+    > & { textarea?: false; suffix?: string })
   | (Omit<
       TextareaHTMLAttributes<HTMLTextAreaElement>,
       keyof InputWithLabelArgsBase<T, N>
-    > & { textarea: true })
+    > & { textarea: true; suffix?: never })
 ) &
   InputWithLabelArgsBase<T, N>;
