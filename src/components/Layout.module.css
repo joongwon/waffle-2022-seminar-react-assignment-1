@@ -10,11 +10,6 @@
   align-items: center;
 }
 
-.header a {
-  text-decoration: none;
-  color: inherit;
-}
-
 .header img {
   width: 60px;
   margin: 10px;
@@ -22,4 +17,25 @@
 
 .header h1 {
   font-size: 20px;
+}
+
+.header > div {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.header > :last-child {
+  justify-content: right;
+  padding: 10px;
+}
+
+.button {
+  border: solid 1px;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 15px;
+  margin: 5px;
+  box-sizing: border-box;
+  background: #FFF;
 }

@@ -1,11 +1,25 @@
-import { useId } from "react";
+import {
+  FormHTMLAttributes,
+  InputHTMLAttributes,
+  TextareaHTMLAttributes,
+  useId,
+} from "react";
 import styles from "./Form.module.css";
 
-export function Form({ children, className, ...rest }: any) {
+export function Form({
+  children,
+  className,
+  onSubmit,
+  ...rest
+}: FormHTMLAttributes<HTMLFormElement>) {
   return (
-    <div className={`${className} ${styles["form"]}`} {...rest}>
+    <form
+      className={`${className} ${styles["form"]}`}
+      onSubmit={onSubmit ?? ((e) => e.preventDefault())}
+      {...rest}
+    >
       {children}
-    </div>
+    </form>
   );
 }
 
@@ -25,7 +39,6 @@ export function StaticField({
 }
 
 type InputWithLabelArgs<T, N extends keyof T> = {
-  textarea?: boolean;
   value: T;
   label: string;
   name: N;
@@ -53,7 +66,18 @@ export function InputWithLabel<T, N extends keyof T>({
   propToString,
   stringToProp,
   textarea,
-}: InputWithLabelArgs<T, N>) {
+  ...rest
+}: (
+  | (Omit<
+      InputHTMLAttributes<HTMLInputElement>,
+      keyof InputWithLabelArgs<T, N>
+    > & { textarea?: false })
+  | (Omit<
+      TextareaHTMLAttributes<HTMLTextAreaElement>,
+      keyof InputWithLabelArgs<T, N>
+    > & { textarea: true })
+) &
+  InputWithLabelArgs<T, N>) {
   const pts = propToString ?? ((x: string) => x);
   const stp = stringToProp ?? ((x: string) => x);
   const id = useId();
@@ -67,6 +91,7 @@ export function InputWithLabel<T, N extends keyof T>({
             setValue({ ...value, [name]: stp(e.target.value) });
           }}
           value={pts(value[name])}
+          {...rest}
         />
       ) : (
         <input
@@ -75,6 +100,7 @@ export function InputWithLabel<T, N extends keyof T>({
             setValue({ ...value, [name]: stp(e.target.value) });
           }}
           value={pts(value[name])}
+          {...rest}
         />
       )}
     </>
