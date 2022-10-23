@@ -11,7 +11,9 @@ import { useMenuDataContext } from "../../contexts/MenuDataContext";
 import { useCallback } from "react";
 import { useSessionContext } from "../../contexts/SessionContext";
 
-export default function MenuDetails({ menu }: { menu: Menu }) {
+type MenuDetailsProps = { menu: Menu };
+
+export default function MenuDetails({ menu }: MenuDetailsProps) {
   const formattedPrice = formatPrice(menu.price);
   const { deleteMenu } = useMenuDataContext();
   const navigate = useNavigate();

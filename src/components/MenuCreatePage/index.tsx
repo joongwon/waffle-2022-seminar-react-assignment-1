@@ -13,12 +13,12 @@ import { Form, InputWithLabel } from "../Form";
 import styles from "./index.module.css";
 import { useSessionContext } from "../../contexts/SessionContext";
 
+type MenuForm = Omit<MenuCreateInput, "price"> & { price: number | null };
+
 export default function MenuEditPage() {
   const { addMenu } = useMenuDataContext();
   const { user } = useSessionContext();
-  const [menu, setMenu] = useState<
-    Omit<MenuCreateInput, "price"> & { price: number | null }
-  >({
+  const [menu, setMenu] = useState<MenuForm>({
     price: null,
     type: MenuType.waffle,
     name: "",

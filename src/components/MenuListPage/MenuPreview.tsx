@@ -6,13 +6,15 @@ import styles from "./MenuPreview.module.css";
 import { Link } from "react-router-dom";
 import { Menu } from "../../lib/types";
 
+interface MenuPreviewProps {
+  menu: Menu | null;
+  onClosePreview(): void;
+}
+
 export default function MenuPreview({
   menu: menuInput,
   onClosePreview,
-}: {
-  menu: Menu | null;
-  onClosePreview(): void;
-}) {
+}: MenuPreviewProps) {
   const [menu, setMenu] = useState<Menu | null>(null);
   useEffect(() => {
     if (menuInput) {

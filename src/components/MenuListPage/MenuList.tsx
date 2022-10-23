@@ -2,15 +2,13 @@ import MenuItem from "./MenuItem";
 import "./MenuList.css";
 import { Menu } from "../../lib/types";
 
-const MenuList = ({
-  menus,
-  selectedId,
-  setSelectedId,
-}: {
+interface MenuListProps {
   menus: Menu[];
   selectedId: number | null;
   setSelectedId(value: number | null): void;
-}) => (
+}
+
+const MenuList = ({ menus, selectedId, setSelectedId }: MenuListProps) => (
   <ul className="menu-list">
     <li className="list-header">
       <div>ID</div>

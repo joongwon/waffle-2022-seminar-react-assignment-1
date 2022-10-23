@@ -1,10 +1,6 @@
-import {
-  FormHTMLAttributes,
-  InputHTMLAttributes,
-  TextareaHTMLAttributes,
-  useId,
-} from "react";
+import { FormHTMLAttributes, useId } from "react";
 import styles from "./Form.module.css";
+import { InputWithLabelProps } from "../lib/types";
 
 export function Form({
   children,
@@ -23,13 +19,12 @@ export function Form({
   );
 }
 
-export function StaticField({
-  value,
-  label,
-}: {
+interface StaticFieldProps {
   value: string;
   label: string;
-}) {
+}
+
+export function StaticField({ value, label }: StaticFieldProps) {
   return (
     <>
       <label>{label}</label>
@@ -37,26 +32,6 @@ export function StaticField({
     </>
   );
 }
-
-type InputWithLabelArgs<T, N extends keyof T> = {
-  value: T;
-  label: string;
-  name: N;
-  setValue: (value: T) => void;
-} & (T[N] extends string
-  ? {
-      propToString?: (prop: T[N]) => string;
-    }
-  : {
-      propToString: (prop: T[N]) => string;
-    }) &
-  (T[N] extends string
-    ? {
-        stringToProp?: (prop: string) => T[N];
-      }
-    : {
-        stringToProp: (prop: string) => T[N];
-      });
 
 export function InputWithLabel<T, N extends keyof T>({
   value,
@@ -67,17 +42,7 @@ export function InputWithLabel<T, N extends keyof T>({
   stringToProp,
   textarea,
   ...rest
-}: (
-  | (Omit<
-      InputHTMLAttributes<HTMLInputElement>,
-      keyof InputWithLabelArgs<T, N>
-    > & { textarea?: false })
-  | (Omit<
-      TextareaHTMLAttributes<HTMLTextAreaElement>,
-      keyof InputWithLabelArgs<T, N>
-    > & { textarea: true })
-) &
-  InputWithLabelArgs<T, N>) {
+}: InputWithLabelProps<T, N>) {
   const pts = propToString ?? ((x: string) => x);
   const stp = stringToProp ?? ((x: string) => x);
   const id = useId();

@@ -2,13 +2,12 @@ import searchIcon from "../../resources/search-icon.svg";
 import styles from "./SearchBar.module.css";
 import { useId } from "react";
 
-export default function SearchBar({
-  search,
-  setSearch,
-}: {
+interface SearchBarProps {
   search: string;
   setSearch: (value: string) => void;
-}) {
+}
+
+export default function SearchBar({ search, setSearch }: SearchBarProps) {
   const id = useId();
   return (
     <div className={styles["search-bar"]}>

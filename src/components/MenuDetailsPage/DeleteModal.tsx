@@ -1,10 +1,12 @@
+interface DeleteModalProps {
+  handleDeleteMenu(): void;
+  handleCloseModal(): void;
+}
+
 const DeleteModal = ({
   handleDeleteMenu,
   handleCloseModal,
-}: {
-  handleDeleteMenu(): void;
-  handleCloseModal(): void;
-}) => (
+}: DeleteModalProps) => (
   <>
     <div className="modal-title">메뉴 삭제</div>
     <p>정말로 삭제하시겠습니까?</p>

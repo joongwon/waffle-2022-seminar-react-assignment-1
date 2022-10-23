@@ -14,6 +14,10 @@ import { Form, InputWithLabel, StaticField } from "../Form";
 import styles from "./index.module.css";
 import { useSessionContext } from "../../contexts/SessionContext";
 
+type MenuEditForm =
+  | (Omit<MenuUpdateInput, "price"> & { price: number | null })
+  | null;
+
 export default function MenuEditPage() {
   const params = useParams();
   const menuId = useMemo(() => nanToNull(Number(params.menuId)), [params]);
@@ -37,9 +41,7 @@ export default function MenuEditPage() {
       dead.current = true;
     }
   }, [dead, navigate, oldMenu, user]);
-  const [menu, setMenu] = useState<
-    (Omit<MenuUpdateInput, "price"> & { price: number | null }) | null
-  >(null);
+  const [menu, setMenu] = useState<MenuEditForm>(null);
   useEffect(() => {
     menuId && setMenu(getMenuById(menuId));
   }, [getMenuById, menuId]);

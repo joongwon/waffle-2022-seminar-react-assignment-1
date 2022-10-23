@@ -2,15 +2,13 @@ import { formatPrice } from "../../lib/formatting";
 import "./MenuItem.css";
 import { Menu } from "../../lib/types";
 
-const MenuItem = ({
-  menu,
-  selected,
-  handleSelect,
-}: {
+interface MenuItemProps {
   menu: Menu;
   selected: boolean;
   handleSelect(): void;
-}) => {
+}
+
+const MenuItem = ({ menu, selected, handleSelect }: MenuItemProps) => {
   const formattedPrice = formatPrice(menu.price);
   return (
     <li

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./Modal.css";
 
+type ModalState = "open" | "closed" | "closing";
+
 export function useModal(afterClosed = () => {}) {
-  const [state, setState] = useState<"open" | "closed" | "closing">("closed");
+  const [state, setState] = useState<ModalState>("closed");
   const openModal = useCallback(() => {
     setState("open");
   }, []);
@@ -26,15 +28,19 @@ export function useModal(afterClosed = () => {}) {
   );
 }
 
-export function Modal({
-  children,
-  handle,
-  onBackgroundClicked,
-}: {
-  handle: ReturnType<typeof useModal>;
+interface ModalProps {
+  handle: ReturnType<
+    (afterClosed?: () => void) => {
+      openModal: () => void;
+      closeModal: () => void;
+      state: "open" | "closed" | "closing";
+    }
+  >;
   children: any;
   onBackgroundClicked?: () => void;
-}) {
+}
+
+export function Modal({ children, handle, onBackgroundClicked }: ModalProps) {
   return handle.state !== "closed" ? (
     <div
       className={`modal-container ${handle.state}`}
@@ -46,33 +52,3 @@ export function Modal({
     </div>
   ) : null;
 }
-
-export function ModalTitle({ children }: { children: any }) {
-  return <div className="modal-title">{children}</div>;
-}
-
-export function ModalForm({ children }: { children: any }) {
-  return <div className="modal-form">{children}</div>;
-}
-
-export function ModalInputSuffix({
-  children,
-  suffix,
-}: {
-  children: any;
-  suffix: any;
-}) {
-  return (
-    <div className="input-container">
-      {children}
-      <span className="input-suffix">{suffix}</span>
-    </div>
-  );
-}
-
-export function ModalButtonContainer({ children }: { children: any }) {
-  return <div className="modal-button-container">{children}</div>;
-}
-
-export const redButtonClass = "red-button";
-export const greenButtonClass = "green-button";

@@ -1,5 +1,8 @@
 import styles from "./ButtonContainer.module.css";
+import { PropsWithChildren } from "react";
 
-export function ButtonContainer({ children }: any) {
+type ButtonContainerProps = PropsWithChildren;
+
+export function ButtonContainer({ children }: ButtonContainerProps) {
   return <div className={styles["button-container"]}>{children}</div>;
 }
