@@ -33,3 +33,11 @@ export const apiLogout = (token: string) =>
     withCredentials: true,
     headers: auth(token),
   });
+
+export const apiRefresh = () =>
+  axios.post<{ access_token: string }>(url("/auth/refresh"), null, {
+    withCredentials: true,
+  });
+
+export const apiMyInfo = (token: string) =>
+  axios.get<{ owner: Owner }>(url("/owners/me"), { headers: auth(token) });

@@ -3,7 +3,6 @@ import { Form, InputWithLabel } from "../Form";
 import { FormEventHandler, useCallback, useState } from "react";
 import { useSessionContext } from "../../contexts/SessionContext";
 import { useNavigate } from "react-router-dom";
-import { apiLogin } from "../../lib/api";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -12,23 +11,20 @@ function useLoginPageLogic() {
     username: "",
     password: "",
   });
-  const { setLoginInfo } = useSessionContext();
+  const { login } = useSessionContext();
   const navigate = useNavigate();
   const onSubmit = useCallback<FormEventHandler>(
     (event) => {
       event.preventDefault();
-      apiLogin(loginForm.username, loginForm.password)
-        .then((r) => {
-          setLoginInfo(r.data);
-          navigate("/");
-        })
+      login(loginForm.username, loginForm.password)
+        .then(() => navigate("/"))
         .catch((reason) => {
           if (axios.isAxiosError(reason)) {
             toast.error(reason.response?.data.message ?? "오류가 발생했습니다");
           } else throw reason;
         });
     },
-    [loginForm.password, loginForm.username, navigate, setLoginInfo]
+    [login, loginForm.password, loginForm.username, navigate]
   );
   return { loginForm, setLoginForm, onSubmit };
 }

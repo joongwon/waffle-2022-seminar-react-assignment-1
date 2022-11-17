@@ -2,15 +2,9 @@ import waffleLogo from "../resources/waffle-logo.svg";
 import styles from "./Layout.module.css";
 import { Link, Outlet } from "react-router-dom";
 import { useSessionContext } from "../contexts/SessionContext";
-import { useCallback } from "react";
-import { apiLogout } from "../lib/api";
 
 export default function Layout() {
-  const { access_token, owner, setLoginInfo } = useSessionContext();
-  const logout = useCallback(() => {
-    access_token && apiLogout(access_token).catch();
-    setLoginInfo(null);
-  }, [access_token, setLoginInfo]);
+  const { logout, owner } = useSessionContext();
   return (
     <div className={styles.app}>
       <header className={styles.header}>
@@ -28,7 +22,7 @@ export default function Layout() {
             <Link to={`stores/${owner.id}`} className={styles["button"]}>
               내 가게
             </Link>
-            <button onClick={logout} className={styles["button"]}>
+            <button onClick={() => logout()} className={styles["button"]}>
               로그아웃
             </button>
           </div>
