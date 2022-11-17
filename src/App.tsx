@@ -1,4 +1,3 @@
-import "./components/MenuListPage/index.module.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoginPage from "./components/LoginPage";
 import MenuCreatePage from "./components/MenuCreatePage";
@@ -9,6 +8,8 @@ import { MenuDataProvider } from "./contexts/MenuDataContext";
 import Layout from "./components/Layout";
 import MenuDetailsPage from "./components/MenuDetailsPage";
 import { SessionProvider } from "./contexts/SessionContext";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 function AppRoutes() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
       <MenuDataProvider>
         <BrowserRouter>
           <AppRoutes />
+          <ToastContainer />
         </BrowserRouter>
       </MenuDataProvider>
     </SessionProvider>

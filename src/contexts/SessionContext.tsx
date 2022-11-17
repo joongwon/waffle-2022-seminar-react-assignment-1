@@ -1,34 +1,42 @@
-import { createContext, useContext, useState } from "react";
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useState,
+} from "react";
+import { LoginInfo, Owner } from "../lib/api";
 
-type SessionContextData = {
-  user: {
-    id: number;
-    username: string;
-  } | null;
-  login(username: string): void;
-  logout(): void;
-};
-
-const SessionContext = createContext<SessionContextData>({
-  user: null,
-  login() {
+const SessionContext = createContext({
+  loginInfo: null as LoginInfo | null,
+  user: null as Owner | null,
+  setLoginInfo(_loginInfo: LoginInfo | null): void {
     throw new Error("SessionContext not provided");
   },
-  logout() {
+  updateToken(_token: string): void {
     throw new Error("SessionContext not provided");
   },
 });
 
-export function SessionProvider({ children }: any) {
-  const [user, setUser] = useState<SessionContextData["user"]>(null);
-  function login(username: string) {
-    setUser({ id: 1, username });
-  }
-  function logout() {
-    setUser(null);
-  }
+export function SessionProvider({ children }: PropsWithChildren) {
+  const [loginInfo, setLoginInfo] = useState<LoginInfo | null>(null);
+  const updateToken = useCallback(
+    (token: string) =>
+      setLoginInfo((prev) => {
+        if (!prev) throw new Error("cannot update non-existent token");
+        return prev && { ...prev, access_token: token };
+      }),
+    []
+  );
   return (
-    <SessionContext.Provider value={{ user, login, logout }}>
+    <SessionContext.Provider
+      value={{
+        setLoginInfo,
+        loginInfo,
+        updateToken,
+        user: loginInfo?.owner ?? null,
+      }}
+    >
       {children}
     </SessionContext.Provider>
   );
