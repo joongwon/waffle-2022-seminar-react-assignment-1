@@ -13,7 +13,7 @@ function MenuListPage() {
   const [search, setSearch] = useState("");
   const [searchParams, setParams] = useSearchParams();
   const selectedId = nanToNull(Number(searchParams.get("menu")));
-  const { user } = useSessionContext();
+  const { owner } = useSessionContext();
   function setSelectedId(n: number | null) {
     if (n === null) setParams({});
     else setParams({ menu: n.toString() });
@@ -45,7 +45,7 @@ function MenuListPage() {
             selectedId={selectedId}
             setSelectedId={setSelectedId}
           />
-          {user && (
+          {owner && (
             <Link to="/menus/new" className={styles["open-add-modal"]}>
               <img src={addIcon} alt="새 메뉴" />
             </Link>

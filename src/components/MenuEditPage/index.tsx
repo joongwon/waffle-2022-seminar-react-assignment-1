@@ -22,7 +22,7 @@ export default function MenuEditPage() {
   const params = useParams();
   const menuId = useMemo(() => nanToNull(Number(params.menuId)), [params]);
   const navigate = useNavigate();
-  const { user } = useSessionContext();
+  const { owner } = useSessionContext();
   const { getMenuById, updateMenu } = useMenuDataContext();
   const oldMenu = useMemo(
     () => menuId && getMenuById(menuId),
@@ -31,16 +31,16 @@ export default function MenuEditPage() {
   const dead = useRef(false);
   useEffect(() => {
     if (dead.current) return;
-    if (!user) {
+    if (!owner) {
       alert("메뉴를 수정하려면 로그인하세요");
       navigate("/auth/login", { replace: true });
       dead.current = true;
     } else if (!oldMenu) {
       alert("존재하지 않는 메뉴입니다");
-      navigate(`/stores/${user.id}`, { replace: true });
+      navigate(`/stores/${owner.id}`, { replace: true });
       dead.current = true;
     }
-  }, [dead, navigate, oldMenu, user]);
+  }, [dead, navigate, oldMenu, owner]);
   const [menu, setMenu] = useState<MenuEditForm>(null);
   useEffect(() => {
     menuId && setMenu(getMenuById(menuId));

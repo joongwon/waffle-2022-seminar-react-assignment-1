@@ -20,7 +20,7 @@ type MenuForm = Omit<MenuCreateInput, "price" | "type"> & {
 
 export default function MenuEditPage() {
   const { addMenu } = useMenuDataContext();
-  const { user } = useSessionContext();
+  const { owner } = useSessionContext();
   const [menu, setMenu] = useState<MenuForm>({
     price: null,
     type: null,
@@ -30,12 +30,12 @@ export default function MenuEditPage() {
   const dead = useRef(false);
   useEffect(() => {
     if (dead.current) return;
-    if (!user) {
+    if (!owner) {
       alert("메뉴를 수정하려면 로그인하세요");
       navigate("/auth/login", { replace: true });
       dead.current = true;
     }
-  }, [dead, navigate, user]);
+  }, [dead, navigate, owner]);
   const id = useId();
   return (
     <div className={styles["container"]}>

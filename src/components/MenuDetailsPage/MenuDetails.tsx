@@ -22,7 +22,7 @@ export default function MenuDetails({ menu }: MenuDetailsProps) {
     deleteMenu(menu.id);
     navigate(`/stores/1`);
   }, [deleteMenu, menu.id, navigate]);
-  const { user } = useSessionContext();
+  const { owner } = useSessionContext();
   return (
     <div className={styles["menu-details"]}>
       <div className={styles["info-container"]}>
@@ -34,7 +34,7 @@ export default function MenuDetails({ menu }: MenuDetailsProps) {
         <p>{formattedPrice}원</p>
         <p>{displayType(menu.type)}</p>
         <p>{menu.description}</p>
-        {user && (
+        {owner && (
           <div className={styles["buttons-container"]}>
             <Link to={`/menus/${menu.id}/edit`} className={styles["button"]}>
               <img src={editIcon} alt="수정" />

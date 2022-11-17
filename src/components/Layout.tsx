@@ -6,8 +6,7 @@ import { useCallback } from "react";
 import { apiLogout } from "../lib/api";
 
 export default function Layout() {
-  const { loginInfo, setLoginInfo } = useSessionContext();
-  const { owner, access_token } = loginInfo ?? {};
+  const { access_token, owner, setLoginInfo } = useSessionContext();
   const logout = useCallback(() => {
     access_token && apiLogout(access_token).catch();
     setLoginInfo(null);

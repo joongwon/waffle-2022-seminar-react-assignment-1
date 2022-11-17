@@ -8,8 +8,8 @@ import {
 import { LoginInfo, Owner } from "../lib/api";
 
 const SessionContext = createContext({
-  loginInfo: null as LoginInfo | null,
-  user: null as Owner | null,
+  access_token: null as string | null,
+  owner: null as Owner | null,
   setLoginInfo(_loginInfo: LoginInfo | null): void {
     throw new Error("SessionContext not provided");
   },
@@ -32,9 +32,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
     <SessionContext.Provider
       value={{
         setLoginInfo,
-        loginInfo,
+        access_token: loginInfo?.access_token ?? null,
         updateToken,
-        user: loginInfo?.owner ?? null,
+        owner: loginInfo?.owner ?? null,
       }}
     >
       {children}
