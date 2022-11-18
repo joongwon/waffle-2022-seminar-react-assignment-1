@@ -68,6 +68,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
       try {
         return await req(token);
       } catch (e) {
+        console.log(e);
         if (!(axios.isAxiosError(e) && e.status === 401)) throw e;
       }
       const newToken = await refresh();

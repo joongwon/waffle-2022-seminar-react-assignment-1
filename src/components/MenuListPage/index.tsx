@@ -3,7 +3,7 @@ import SearchBar from "./SearchBar";
 import MenuList from "./MenuList";
 import addIcon from "../../resources/add-icon.svg";
 import MenuPreview from "./MenuPreview";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import styles from "./index.module.css";
 import { useSessionContext } from "../../contexts/SessionContext";
 import {
@@ -16,6 +16,8 @@ import { nanToNull } from "../../lib/formatting";
 import { useMySearchParams } from "../../lib/hooks";
 import { useHeaderDataContext } from "../../contexts/HeaderDataContext";
 import { DummyMenu, Menu } from "../../lib/types";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 function useSelectedMenu(ownerId: number | null) {
   const [rawSelectedId, setSelectedId] = useMySearchParams("menu");
@@ -43,14 +45,31 @@ function useSelectedMenu(ownerId: number | null) {
 function MenuListPage() {
   const [search, setSearch] = useMySearchParams("search");
   const ownerId = nanToNull(parseInt(useParams().ownerId ?? "NaN"));
+  const navigate = useNavigate();
   const { selectedMenu, select } = useSelectedMenu(ownerId);
   const { me } = useSessionContext();
   const { data: menusData } = useApiData(
     useApiMenuListFetcher(ownerId, search)
   );
   const menus = menusData?.data ?? null;
-  const { data: ownerData } = useApiData(useApiOwnerInfo(ownerId));
+  const { data: ownerData, error: ownerError } = useApiData(
+    useApiOwnerInfo(ownerId)
+  );
   const { setOwner } = useHeaderDataContext();
+  useEffect(() => {
+    if (!ownerId) {
+      toast.warning("잘못된 주소입니다");
+      navigate(-1);
+    }
+  }, [navigate, ownerId]);
+  useEffect(() => {
+    const err = ownerError?.payload;
+    console.log(err);
+    if (err && axios.isAxiosError(err) && err.response?.status === 404) {
+      toast.warning("존재하지 않는 가게입니다");
+      navigate(-1);
+    }
+  }, [navigate, ownerError?.payload]);
   useEffect(() => {
     ownerData && setOwner(ownerData?.owner);
   }, [ownerData, setOwner]);

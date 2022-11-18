@@ -49,6 +49,33 @@ export const apiUpdateMenu = (
 export const apiDeleteMenu = (id: number, token: string) =>
   axios.delete(url(`/menus/${id}`), { headers: auth(token) });
 
+export const apiCreateReview = (
+  menu: number,
+  rating: number,
+  content: string,
+  token: string
+) =>
+  axios.post<Review>(
+    url("/reviews/"),
+    { menu, rating, content },
+    { headers: auth(token) }
+  );
+
+export const apiUpdateReview = (
+  reviewId: number,
+  rating: number,
+  content: string,
+  token: string
+) =>
+  axios.patch<Review>(
+    url(`/reviews/${reviewId}`),
+    { rating, content },
+    { headers: auth(token) }
+  );
+
+export const apiDeleteReview = (id: number, token: string) =>
+  axios.delete(url(`/reviews/${id}`), { headers: auth(token) });
+
 export function useApiData<T>(
   fetch: ((cancel: CancelToken) => Promise<AxiosResponse<T>>) | null
 ) {
@@ -136,43 +163,62 @@ export function useApiReviewInfScroll(_menu: number, count: number) {
   const [from, setFrom] = useState<string | undefined>();
   const [menu, setMenu] = useState(_menu);
   const [end, setEnd] = useState(false);
-  const clear = useCallback(() => setData([]), []);
+  const [loading, setLoading] = useState(false);
+  const cancelRef = useRef<CancelTokenSource | null>(null);
+  const cancel = useCallback(() => {
+    cancelRef.current?.cancel();
+  }, []);
+  const fetch = useCallback(
+    async (menu: number, count: number, from?: string) => {
+      setLoading(true);
+      cancel();
+      const source = axios.CancelToken.source();
+      cancelRef.current = source;
+      try {
+        const res = await axios.get<{ data: Review[]; next: string }>(
+          url("/reviews/", {
+            menu: menu.toString(),
+            count: count.toString(),
+            ...(from && { from }),
+          }),
+          { cancelToken: source.token }
+        );
+        return res.data;
+      } finally {
+        cancelRef.current = null;
+        setLoading(false);
+      }
+    },
+    [cancel]
+  );
+  const refresh = useCallback(
+    () =>
+      fetch(menu, count)
+        .then((resData) => {
+          setData(resData.data);
+          setFrom(resData.next);
+          setEnd(resData.data.length === 0);
+        })
+        .catch((err) => {
+          if (!axios.isCancel(err)) throw err;
+        }),
+    [count, fetch, menu]
+  );
+  const next = useCallback(async () => {
+    if (end || loading) return;
+    const resData = await fetch(menu, count, from);
+    if (resData.data.length === 0) {
+      setEnd(true);
+      return;
+    }
+    setData([...data, ...resData.data]);
+    setFrom(resData.next);
+  }, [count, data, end, fetch, from, loading, menu]);
   useEffect(() => {
     if (menu !== _menu) {
       setData([]);
       setMenu(_menu);
     }
   }, [_menu, menu]);
-  const [loading, setLoading] = useState(false);
-  const cancelRef = useRef<CancelTokenSource | null>(null);
-  const cancel = useCallback(() => {
-    cancelRef.current?.cancel();
-  }, []);
-  const next = useCallback(async () => {
-    if (end || loading) return;
-    setLoading(true);
-    cancel();
-    const source = axios.CancelToken.source();
-    cancelRef.current = source;
-    try {
-      const res = await axios.get<{ data: Review[]; next: string }>(
-        url("/reviews/", {
-          menu: menu.toString(),
-          count: count.toString(),
-          ...(from && { from }),
-        }),
-        { cancelToken: source.token }
-      );
-      if (res.data.data.length === 0) {
-        setEnd(true);
-        return;
-      }
-      setData([...data, ...res.data.data]);
-      setFrom(res.data.next);
-    } finally {
-      cancelRef.current = null;
-      setLoading(false);
-    }
-  }, [cancel, count, data, end, from, loading, menu]);
-  return { clear, next, data, cancel, loading };
+  return { refresh, next, data, cancel, loading };
 }

@@ -6,6 +6,7 @@
   grid-auto-flow: column;
   grid-gap: 20px;
   padding: 20px;
+  overflow-y: clip;
 }
 
 .container:not(.selected) {
@@ -28,6 +29,7 @@
 }
 
 .list-wrapper {
+  overflow-y: clip;
   position: relative;
 }
 

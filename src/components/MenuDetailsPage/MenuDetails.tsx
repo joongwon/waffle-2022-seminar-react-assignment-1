@@ -56,14 +56,13 @@ export default function MenuDetails({ menu }: MenuDetailsProps) {
           </div>
         )}
       </div>
-      {
-        <Modal handle={modalHandle}>
-          <DeleteModal
-            handleDeleteMenu={onDelete}
-            handleCloseModal={modalHandle.closeModal}
-          />
-        </Modal>
-      }
+      <Modal handle={modalHandle}>
+        <DeleteModal
+          title="메뉴 삭제"
+          onDelete={onDelete}
+          onClose={modalHandle.closeModal}
+        />
+      </Modal>
     </div>
   );
 }

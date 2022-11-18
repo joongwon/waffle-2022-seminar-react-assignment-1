@@ -14,16 +14,18 @@ function useMenuEditPageLogic() {
   const menuId = nanToNull(parseInt(useParams().menuId ?? "NaN"));
   const navigate = useNavigate();
   const { me, withToken, loading: meLoading } = useSessionContext();
-  const { data: oldMenu } = useApiData(useApiMenuFetcher(menuId));
+  const { data: oldMenu, loading: menuLoading } = useApiData(
+    useApiMenuFetcher(menuId)
+  );
   useEffect(() => {
     if (!meLoading && !me) {
       toast.warning("메뉴를 수정하려면 먼저 로그인하세요");
       navigate("/auth/login", { replace: true });
-    } else if (!meLoading && me?.id !== oldMenu?.owner.id) {
+    } else if (!meLoading && !menuLoading && me?.id !== oldMenu?.owner.id) {
       toast.warning("내 가게의 메뉴가 아닙니다");
       navigate(`/menus/${oldMenu?.id}`, { replace: true });
     }
-  }, [navigate, oldMenu, me, meLoading]);
+  }, [navigate, oldMenu, me, meLoading, menuLoading]);
   const [menu, setMenu] = useState<{
     price?: number | null;
     image?: string | null;
