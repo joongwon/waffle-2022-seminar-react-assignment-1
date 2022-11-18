@@ -44,6 +44,20 @@ export type DummyMenu = {
   owner?: never;
 };
 
+export type ApiCreateMenuParams = {
+  name: string;
+  type: MenuType;
+  price: number;
+  image?: string;
+  description?: string;
+};
+
+export type ApiUpdateMenuParams = {
+  price?: number;
+  image?: string | null;
+  description?: string | null;
+};
+
 const url = (path: string, param?: Record<string, string>) =>
   (process.env.NODE_ENV === "production"
     ? `https://ah9mefqs2f.execute-api.ap-northeast-2.amazonaws.com${path}`
@@ -72,8 +86,17 @@ export const apiRefresh = () =>
 export const apiMyInfo = (token: string) =>
   axios.get<{ owner: Owner }>(url("/owners/me"), { headers: auth(token) });
 
-export const apiListMenus = (owner: number) =>
-  axios.get<{ data: Menu[] }>(url("/menus/", { owner: owner.toString() }));
+export const apiCreateMenu = (menu: ApiCreateMenuParams, token: string) =>
+  axios.post<Menu>(url("/menus/"), menu, { headers: auth(token) });
+
+export const apiUpdateMenu = (
+  id: number,
+  menu: ApiUpdateMenuParams,
+  token: string
+) => axios.patch<Menu>(url(`/menus/${id}`), menu, { headers: auth(token) });
+
+export const apiDeleteMenu = (id: number, token: string) =>
+  axios.delete(url(`/menus/${id}`), { headers: auth(token) });
 
 export function useApiData<T>(
   fetch: ((cancel: CancelToken) => Promise<AxiosResponse<T>>) | null
@@ -127,7 +150,7 @@ export const useApiMenuListFetcher = (
     (cancelToken: CancelToken) =>
       axios.get<{ data: Menu[] }>(
         url("/menus/", {
-          owner: owner?.toString() ?? "",
+          ...(owner && { owner: owner.toString() }),
           ...(search && { search }),
         }),
         { cancelToken }

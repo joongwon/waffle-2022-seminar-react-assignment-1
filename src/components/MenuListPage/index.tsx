@@ -3,7 +3,7 @@ import SearchBar from "./SearchBar";
 import MenuList from "./MenuList";
 import addIcon from "../../resources/add-icon.svg";
 import MenuPreview from "./MenuPreview";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import styles from "./index.module.css";
 import { useSessionContext } from "../../contexts/SessionContext";
 import {
@@ -14,23 +14,7 @@ import {
   useApiMenuListFetcher,
 } from "../../lib/api";
 import { nanToNull } from "../../lib/formatting";
-
-function useMySearchParams(key: string) {
-  const [searchParams, setParams] = useSearchParams();
-  const search = searchParams.get(key);
-  const setSearch = useCallback(
-    (newValue: string | null) => {
-      setParams((prev) => {
-        const newParams = new URLSearchParams(prev);
-        if (newValue) newParams.set(key, newValue);
-        else newParams.delete(key);
-        return newParams;
-      });
-    },
-    [key, setParams]
-  );
-  return [search, setSearch] as const;
-}
+import { useMySearchParams } from "../../lib/hooks";
 
 function useSelectedMenu(ownerId: number | null) {
   const [rawSelectedId, setSelectedId] = useMySearchParams("menu");

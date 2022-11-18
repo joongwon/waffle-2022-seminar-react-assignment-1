@@ -1,17 +1,18 @@
 import styles from "./index.module.css";
 import { Link, useParams } from "react-router-dom";
-import { useMenuDataContext } from "../../contexts/MenuDataContext";
-import { useMemo } from "react";
 import MenuDetails from "./MenuDetails";
 import ArrowBackIcon from "../../resources/arrow-back-icon.svg";
+import { useApiData, useApiMenuFetcher } from "../../lib/api";
 
 export default function MenuDetailsPage() {
-  const { getMenuById } = useMenuDataContext();
   const menuId = Number(useParams().menuId);
-  const menu = useMemo(() => getMenuById(menuId), [getMenuById, menuId]);
+  const { data: menu } = useApiData(useApiMenuFetcher(menuId));
   return menu ? (
     <div className={styles["container"]}>
-      <Link to={`/stores/1?menu=${menuId}`} className={styles["back-link"]}>
+      <Link
+        to={`/stores/${menu.owner.id}?menu=${menuId}`}
+        className={styles["back-link"]}
+      >
         <img src={ArrowBackIcon} alt="" width="32px" />
         메뉴 목록
       </Link>

@@ -35,7 +35,7 @@ export type Menu = {
   description?: string;
 };
 export type MenuUpdateInput = {
-  price: number;
+  price?: number;
   image?: string;
   description?: string;
 };

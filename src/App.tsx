@@ -4,7 +4,6 @@ import MenuCreatePage from "./components/MenuCreatePage";
 import MenuEditPage from "./components/MenuEditPage";
 import MenuListPage from "./components/MenuListPage";
 import StoreListPage from "./components/StoreListPage";
-import { MenuDataProvider } from "./contexts/MenuDataContext";
 import Layout from "./components/Layout";
 import MenuDetailsPage from "./components/MenuDetailsPage";
 import { SessionProvider } from "./contexts/SessionContext";
@@ -29,12 +28,10 @@ function AppRoutes() {
 export default function App() {
   return (
     <SessionProvider>
-      <MenuDataProvider>
-        <BrowserRouter>
-          <AppRoutes />
-          <ToastContainer />
-        </BrowserRouter>
-      </MenuDataProvider>
+      <BrowserRouter>
+        <AppRoutes />
+        <ToastContainer />
+      </BrowserRouter>
     </SessionProvider>
   );
 }

@@ -4,24 +4,27 @@ import deleteIcon from "../../resources/delete-icon.svg";
 import { formatPrice } from "../../lib/formatting";
 import styles from "./MenuDetails.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import { displayType, Menu } from "../../lib/types";
+import { displayType } from "../../lib/types";
 import { Modal, useModal } from "../Modal";
 import DeleteModal from "./DeleteModal";
-import { useMenuDataContext } from "../../contexts/MenuDataContext";
 import { useCallback } from "react";
 import { useSessionContext } from "../../contexts/SessionContext";
+import { apiDeleteMenu, Menu } from "../../lib/api";
+import { toast } from "react-toastify";
 
 type MenuDetailsProps = { menu: Menu };
 
 export default function MenuDetails({ menu }: MenuDetailsProps) {
   const formattedPrice = formatPrice(menu.price);
-  const { deleteMenu } = useMenuDataContext();
   const navigate = useNavigate();
   const modalHandle = useModal();
+  const { withToken } = useSessionContext();
   const onDelete = useCallback(() => {
-    deleteMenu(menu.id);
-    navigate(`/stores/1`);
-  }, [deleteMenu, menu.id, navigate]);
+    withToken((token) => apiDeleteMenu(menu.id, token)).then(() => {
+      toast.success("메뉴를 삭제하였습니다");
+      navigate(`/stores/${menu.owner.id}`);
+    });
+  }, [menu, navigate, withToken]);
   const { owner } = useSessionContext();
   return (
     <div className={styles["menu-details"]}>
