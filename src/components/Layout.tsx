@@ -3,6 +3,7 @@ import styles from "./Layout.module.scss";
 import { Link, Outlet } from "react-router-dom";
 import { useSessionContext } from "../contexts/SessionContext";
 import { useHeaderDataContext } from "../contexts/HeaderDataContext";
+import { toast } from "react-toastify";
 
 export default function Layout() {
   const { logout, me } = useSessionContext();
@@ -32,7 +33,13 @@ export default function Layout() {
             <Link to={`stores/${me.id}`} className={styles["button"]}>
               내 가게
             </Link>
-            <button onClick={() => logout()} className={styles["button"]}>
+            <button
+              onClick={() => {
+                logout().catch();
+                toast.success("로그아웃되었습니다");
+              }}
+              className={styles["button"]}
+            >
               로그아웃
             </button>
           </div>

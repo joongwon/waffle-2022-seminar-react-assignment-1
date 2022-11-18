@@ -20,22 +20,25 @@ import { toast } from "react-toastify";
 
 const SessionContext = createContext({
   me: null as Owner | null,
+  loading: false,
   withToken<T>(_req: (token: string) => Promise<T>): Promise<T | null> {
     throw new Error("SessionContext not provided");
   },
   logout(): Promise<void> {
     throw new Error("SessionContext not provided");
   },
-  login(_username: string, _password: string): Promise<void> {
+  login(_username: string, _password: string): Promise<Owner> {
     throw new Error("SessionContext not provided");
   },
 });
 
 export function SessionProvider({ children }: PropsWithChildren) {
   const [loginInfo, setLoginInfo] = useState<LoginInfo | null>(null);
+  const [loading, setLoading] = useState(false);
   const refreshRef = useRef<Promise<string | null> | null>(null);
   const refresh = useCallback(() => {
-    if (!refreshRef.current)
+    if (!refreshRef.current) {
+      setLoading(true);
       refreshRef.current = (async () => {
         try {
           const res = await apiRefresh();
@@ -51,8 +54,11 @@ export function SessionProvider({ children }: PropsWithChildren) {
           setLoginInfo(null);
           refreshRef.current = null;
           return null;
+        } finally {
+          setLoading(false);
         }
       })();
+    }
     return refreshRef.current;
   }, []);
   useEffect(() => {
@@ -84,8 +90,14 @@ export function SessionProvider({ children }: PropsWithChildren) {
     setLoginInfo(null);
   }, [loginInfo]);
   const login = useCallback(async (username: string, password: string) => {
-    const { data } = await apiLogin(username, password);
-    setLoginInfo(data);
+    setLoading(true);
+    try {
+      const { data } = await apiLogin(username, password);
+      setLoginInfo(data);
+      return data.owner;
+    } finally {
+      setLoading(false);
+    }
   }, []);
   return (
     <SessionContext.Provider
@@ -94,6 +106,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         withToken,
         logout,
         login,
+        loading,
       }}
     >
       {children}

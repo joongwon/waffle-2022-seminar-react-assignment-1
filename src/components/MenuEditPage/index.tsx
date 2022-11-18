@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { formatPrice, nanToNull, priceToNum } from "../../lib/formatting";
 import { displayType } from "../../lib/types";
@@ -13,21 +13,17 @@ import axios from "axios";
 function useMenuEditPageLogic() {
   const menuId = nanToNull(parseInt(useParams().menuId ?? "NaN"));
   const navigate = useNavigate();
-  const { me, withToken } = useSessionContext();
+  const { me, withToken, loading: meLoading } = useSessionContext();
   const { data: oldMenu } = useApiData(useApiMenuFetcher(menuId));
-  const dead = useRef(false);
   useEffect(() => {
-    if (dead.current) return;
-    if (!me) {
-      toast.warning("메뉴를 수정하려면 로그인하세요");
+    if (!meLoading && !me) {
+      toast.warning("메뉴를 수정하려면 먼저 로그인하세요");
       navigate("/auth/login", { replace: true });
-      dead.current = true;
-    } else if (!oldMenu) {
-      toast.warning("존재하지 않는 메뉴입니다");
-      navigate(`/stores/${me.id}`, { replace: true });
-      dead.current = true;
+    } else if (!meLoading && me?.id !== oldMenu?.owner.id) {
+      toast.warning("내 가게의 메뉴가 아닙니다");
+      navigate(`/menus/${oldMenu?.id}`, { replace: true });
     }
-  }, [dead, navigate, oldMenu, me]);
+  }, [navigate, oldMenu, me, meLoading]);
   const [menu, setMenu] = useState<{
     price?: number | null;
     image?: string | null;

@@ -2,12 +2,12 @@ import imagePlaceholder from "../../resources/image-placeholder.png";
 import editIcon from "../../resources/edit-icon.svg";
 import deleteIcon from "../../resources/delete-icon.svg";
 import { formatPrice } from "../../lib/formatting";
-import styles from "./MenuDetails.module.css";
+import styles from "./MenuDetails.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { displayType } from "../../lib/types";
 import { Modal, useModal } from "../Modal";
 import DeleteModal from "./DeleteModal";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSessionContext } from "../../contexts/SessionContext";
 import { apiDeleteMenu, Menu, MenuType } from "../../lib/api";
 import { toast } from "react-toastify";
@@ -26,19 +26,22 @@ export default function MenuDetails({ menu }: MenuDetailsProps) {
         navigate(`/stores/${menu.owner.id}`);
       });
   }, [menu, navigate, withToken]);
+  const [image, setImage] = useState(menu?.image);
+  useEffect(() => setImage(menu?.image), [menu]);
   const { me } = useSessionContext();
   return (
     <div className={styles["menu-details"]}>
       <div className={styles["info-container"]}>
         <img
-          src={menu?.image ? menu.image : imagePlaceholder}
+          src={image ?? imagePlaceholder}
+          onError={() => setImage(undefined)}
           alt="상품 이미지"
         />
         <h3>{menu?.name || "맛있는와플"}</h3>
         <p>{formattedPrice}원</p>
         <p>{displayType(menu?.type ?? MenuType.waffle)}</p>
         <p>{menu?.description}</p>
-        {me && (
+        {me?.id === menu?.owner.id && (
           <div className={styles["buttons-container"]}>
             <Link to={`/menus/${menu?.id}/edit`} className={styles["button"]}>
               <img src={editIcon} alt="수정" />

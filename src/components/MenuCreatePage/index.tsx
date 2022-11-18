@@ -3,7 +3,6 @@ import {
   useCallback,
   useEffect,
   useId,
-  useRef,
   useState,
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -23,7 +22,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 function useMenuEditPageLogic() {
-  const { me, withToken } = useSessionContext();
+  const { me, withToken, loading: meLoading } = useSessionContext();
   const [menu, setMenu] = useState({
     price: null as number | null,
     type: null as MenuType | null,
@@ -32,15 +31,12 @@ function useMenuEditPageLogic() {
     image: undefined as string | undefined,
   });
   const navigate = useNavigate();
-  const dead = useRef(false);
   useEffect(() => {
-    if (dead.current) return;
-    if (!me) {
+    if (!meLoading && !me) {
       alert("메뉴를 수정하려면 로그인하세요");
       navigate("/auth/login", { replace: true });
-      dead.current = true;
     }
-  }, [dead, navigate, me]);
+  }, [navigate, me, meLoading]);
   const submitMenu = useCallback<FormEventHandler>(
     (e) => {
       e.preventDefault();

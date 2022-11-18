@@ -17,7 +17,10 @@ function useLoginPageLogic() {
     (event) => {
       event.preventDefault();
       login(loginForm.username, loginForm.password)
-        .then(() => navigate("/"))
+        .then((res) => {
+          toast.success(`${res.username}님 환영합니다!`);
+          navigate("/");
+        })
         .catch((reason) => {
           if (axios.isAxiosError(reason)) {
             toast.error(reason.response?.data.message ?? "오류가 발생했습니다");

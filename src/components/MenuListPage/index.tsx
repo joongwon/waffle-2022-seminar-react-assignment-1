@@ -77,7 +77,7 @@ function MenuListPage() {
             selectedId={selectedMenu?.id ?? null}
             select={select}
           />
-          {me && (
+          {me?.id === ownerId && (
             <Link to="/menus/new" className={styles["open-add-modal"]}>
               <img src={addIcon} alt="새 메뉴" />
             </Link>
