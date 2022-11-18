@@ -1,5 +1,5 @@
 import waffleLogo from "../resources/waffle-logo.svg";
-import styles from "./Layout.module.css";
+import styles from "./Layout.module.scss";
 import { Link, Outlet } from "react-router-dom";
 import { useSessionContext } from "../contexts/SessionContext";
 import { useHeaderDataContext } from "../contexts/HeaderDataContext";
@@ -15,7 +15,11 @@ export default function Layout() {
             <img src={waffleLogo} alt="와플스튜디오 로고" />
           </Link>
           {owner ? (
-            owner.username
+            <Link to={`/stores/${owner.id}`} className={styles["store-name"]}>
+              <h3>와플스튜디오 메뉴 관리</h3>
+              <h1>{owner.store_name || "이름없는가게"}</h1>
+              <h2>by {owner.username}</h2>
+            </Link>
           ) : (
             <Link to="/">
               <h1>와플스튜디오 메뉴 관리</h1>
