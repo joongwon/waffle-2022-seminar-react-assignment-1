@@ -3,10 +3,16 @@ import { Link, useParams } from "react-router-dom";
 import MenuDetails from "./MenuDetails";
 import ArrowBackIcon from "../../resources/arrow-back-icon.svg";
 import { useApiData, useApiMenuFetcher } from "../../lib/api";
+import { useEffect } from "react";
+import { useHeaderDataContext } from "../../contexts/HeaderDataContext";
 
 export default function MenuDetailsPage() {
   const menuId = Number(useParams().menuId);
+  const { setOwner } = useHeaderDataContext();
   const { data: menu } = useApiData(useApiMenuFetcher(menuId));
+  useEffect(() => {
+    menu && setOwner(menu?.owner);
+  }, [menu, setOwner]);
   return menu ? (
     <div className={styles["container"]}>
       <Link

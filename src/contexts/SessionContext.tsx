@@ -19,7 +19,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const SessionContext = createContext({
-  owner: null as Owner | null,
+  me: null as Owner | null,
   withToken<T>(_req: (token: string) => Promise<T>): Promise<T | null> {
     throw new Error("SessionContext not provided");
   },
@@ -90,7 +90,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   return (
     <SessionContext.Provider
       value={{
-        owner: loginInfo?.owner ?? null,
+        me: loginInfo?.owner ?? null,
         withToken,
         logout,
         login,

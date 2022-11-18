@@ -13,21 +13,21 @@ import axios from "axios";
 function useMenuEditPageLogic() {
   const menuId = nanToNull(parseInt(useParams().menuId ?? "NaN"));
   const navigate = useNavigate();
-  const { owner, withToken } = useSessionContext();
+  const { me, withToken } = useSessionContext();
   const { data: oldMenu } = useApiData(useApiMenuFetcher(menuId));
   const dead = useRef(false);
   useEffect(() => {
     if (dead.current) return;
-    if (!owner) {
+    if (!me) {
       toast.warning("메뉴를 수정하려면 로그인하세요");
       navigate("/auth/login", { replace: true });
       dead.current = true;
     } else if (!oldMenu) {
       toast.warning("존재하지 않는 메뉴입니다");
-      navigate(`/stores/${owner.id}`, { replace: true });
+      navigate(`/stores/${me.id}`, { replace: true });
       dead.current = true;
     }
-  }, [dead, navigate, oldMenu, owner]);
+  }, [dead, navigate, oldMenu, me]);
   const [menu, setMenu] = useState<{
     price?: number | null;
     image?: string | null;

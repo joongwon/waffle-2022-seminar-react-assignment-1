@@ -23,7 +23,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 function useMenuEditPageLogic() {
-  const { owner, withToken } = useSessionContext();
+  const { me, withToken } = useSessionContext();
   const [menu, setMenu] = useState({
     price: null as number | null,
     type: null as MenuType | null,
@@ -35,12 +35,12 @@ function useMenuEditPageLogic() {
   const dead = useRef(false);
   useEffect(() => {
     if (dead.current) return;
-    if (!owner) {
+    if (!me) {
       alert("메뉴를 수정하려면 로그인하세요");
       navigate("/auth/login", { replace: true });
       dead.current = true;
     }
-  }, [dead, navigate, owner]);
+  }, [dead, navigate, me]);
   const submitMenu = useCallback<FormEventHandler>(
     (e) => {
       e.preventDefault();

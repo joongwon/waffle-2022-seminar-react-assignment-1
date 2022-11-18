@@ -25,7 +25,7 @@ export default function MenuDetails({ menu }: MenuDetailsProps) {
       navigate(`/stores/${menu.owner.id}`);
     });
   }, [menu, navigate, withToken]);
-  const { owner } = useSessionContext();
+  const { me } = useSessionContext();
   return (
     <div className={styles["menu-details"]}>
       <div className={styles["info-container"]}>
@@ -37,7 +37,7 @@ export default function MenuDetails({ menu }: MenuDetailsProps) {
         <p>{formattedPrice}원</p>
         <p>{displayType(menu.type)}</p>
         <p>{menu.description}</p>
-        {owner && (
+        {me && (
           <div className={styles["buttons-container"]}>
             <Link to={`/menus/${menu.id}/edit`} className={styles["button"]}>
               <img src={editIcon} alt="수정" />

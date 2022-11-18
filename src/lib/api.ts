@@ -29,7 +29,7 @@ export type Menu = {
   price: number;
   image?: string;
   description?: string;
-  rating: number;
+  rating?: number;
   owner: Owner;
 };
 
@@ -102,35 +102,37 @@ export function useApiData<T>(
   fetch: ((cancel: CancelToken) => Promise<AxiosResponse<T>>) | null
 ) {
   const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<unknown>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<{ payload: unknown } | null>(null);
   const cancelRef = useRef<CancelTokenSource | null>(null);
   const cancel = useCallback(() => {
     cancelRef.current?.cancel();
   }, []);
-  const refresh = useCallback(async () => {
-    if (!fetch) return null;
-    cancel();
-    const source = axios.CancelToken.source();
-    cancelRef.current = source;
-
-    try {
-      const res = await fetch(source.token);
-      setData(res.data);
-      return res;
-    } catch (e) {
-      setError(e);
-      throw e;
-    } finally {
-      cancelRef.current = null;
-    }
-  }, [cancel, fetch]);
   useEffect(() => {
-    refresh().catch((reason) => {
-      if (!axios.isCancel(reason)) throw reason;
-    });
+    (async () => {
+      if (!fetch) return null;
+      setLoading(true);
+      cancel();
+      const source = axios.CancelToken.source();
+      cancelRef.current = source;
+
+      try {
+        const res = await fetch(source.token);
+        setData(res.data);
+        return res;
+      } catch (reason) {
+        if (axios.isCancel(reason)) return;
+        setData(null);
+        setError({ payload: reason });
+        throw reason;
+      } finally {
+        cancelRef.current = null;
+        setLoading(false);
+      }
+    })();
     return () => cancel();
-  }, [cancel, refresh]);
-  return { data, refresh, cancel, error };
+  }, [cancel, fetch]);
+  return { data, loading, error };
 }
 
 export const useApiMenuFetcher = (id: number | null) => {
@@ -156,6 +158,15 @@ export const useApiMenuListFetcher = (
         { cancelToken }
       ),
     [owner, search]
+  );
+  return owner === null ? null : f;
+};
+
+export const useApiOwnerInfo = (owner: number | null) => {
+  const f = useCallback(
+    (cancelToken: CancelToken) =>
+      axios.get<{ owner: Owner }>(url(`/owners/${owner}`), { cancelToken }),
+    [owner]
   );
   return owner === null ? null : f;
 };

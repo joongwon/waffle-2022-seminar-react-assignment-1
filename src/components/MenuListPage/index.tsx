@@ -12,15 +12,17 @@ import {
   useApiData,
   useApiMenuFetcher,
   useApiMenuListFetcher,
+  useApiOwnerInfo,
 } from "../../lib/api";
 import { nanToNull } from "../../lib/formatting";
 import { useMySearchParams } from "../../lib/hooks";
+import { useHeaderDataContext } from "../../contexts/HeaderDataContext";
 
 function useSelectedMenu(ownerId: number | null) {
   const [rawSelectedId, setSelectedId] = useMySearchParams("menu");
   const selectedId = nanToNull(parseInt(rawSelectedId ?? "NaN"));
   const [selectedMenu, setSelectedMenu] = useState<Menu | null | DummyMenu>(
-    null
+    selectedId ? { id: selectedId } : null
   );
   const fetcher = useApiMenuFetcher(selectedId);
   const { data } = useApiData(fetcher);
@@ -43,10 +45,16 @@ function MenuListPage() {
   const [search, setSearch] = useMySearchParams("search");
   const ownerId = nanToNull(parseInt(useParams().ownerId ?? "NaN"));
   const { selectedMenu, select } = useSelectedMenu(ownerId);
-  const { owner } = useSessionContext();
-  const menuListFetcher = useApiMenuListFetcher(ownerId, search);
-  const { data } = useApiData(menuListFetcher);
-  const menus = data?.data ?? null;
+  const { me } = useSessionContext();
+  const { data: menusData } = useApiData(
+    useApiMenuListFetcher(ownerId, search)
+  );
+  const menus = menusData?.data ?? null;
+  const { data: ownerData } = useApiData(useApiOwnerInfo(ownerId));
+  const { setOwner } = useHeaderDataContext();
+  useEffect(() => {
+    ownerData && setOwner(ownerData?.owner);
+  }, [ownerData, setOwner]);
 
   return (
     <>
@@ -69,7 +77,7 @@ function MenuListPage() {
             selectedId={selectedMenu?.id ?? null}
             select={select}
           />
-          {owner && (
+          {me && (
             <Link to="/menus/new" className={styles["open-add-modal"]}>
               <img src={addIcon} alt="새 메뉴" />
             </Link>

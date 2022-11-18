@@ -9,17 +9,26 @@ import MenuDetailsPage from "./components/MenuDetailsPage";
 import { SessionProvider } from "./contexts/SessionContext";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { HeaderDataProvider } from "./contexts/HeaderDataContext";
 
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
+      <Route element={<Layout />}>
         <Route index element={<StoreListPage />} />
-        <Route path="stores/:ownerId" element={<MenuListPage />} />
-        <Route path="menus/:menuId" element={<MenuDetailsPage />} />
-        <Route path="menus/:menuId/edit" element={<MenuEditPage />} />
-        <Route path="menus/new" element={<MenuCreatePage />} />
-        <Route path="auth/login" element={<LoginPage />} />
+        <Route path="/auth/login" element={<LoginPage />} />
+        <Route path="/menus/:menuId/edit" element={<MenuEditPage />} />
+        <Route path="/menus/new" element={<MenuCreatePage />} />
+      </Route>
+      <Route
+        element={
+          <HeaderDataProvider>
+            <Layout />
+          </HeaderDataProvider>
+        }
+      >
+        <Route path="/stores/:ownerId" element={<MenuListPage />} />
+        <Route path="/menus/:menuId" element={<MenuDetailsPage />} />
       </Route>
     </Routes>
   );
@@ -29,8 +38,10 @@ export default function App() {
   return (
     <SessionProvider>
       <BrowserRouter>
-        <AppRoutes />
-        <ToastContainer />
+        <HeaderDataProvider>
+          <AppRoutes />
+          <ToastContainer />
+        </HeaderDataProvider>
       </BrowserRouter>
     </SessionProvider>
   );
