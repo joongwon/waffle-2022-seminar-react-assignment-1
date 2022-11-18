@@ -5,6 +5,7 @@ import ArrowBackIcon from "../../resources/arrow-back-icon.svg";
 import { useApiData, useApiMenuFetcher } from "../../lib/api";
 import { useEffect } from "react";
 import { useHeaderDataContext } from "../../contexts/HeaderDataContext";
+import ReviewList from "./ReviewList";
 
 export default function MenuDetailsPage() {
   const menuId = Number(useParams().menuId);
@@ -23,7 +24,9 @@ export default function MenuDetailsPage() {
         메뉴 목록
       </Link>
       <MenuDetails menu={menu} />
-      <div className={styles["review-container"]} />
+      <div className={styles["review-container"]}>
+        <ReviewList menuId={menuId} />
+      </div>
     </div>
   );
 }

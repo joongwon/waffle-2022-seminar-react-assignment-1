@@ -1,62 +1,13 @@
 import axios, { AxiosResponse, CancelToken, CancelTokenSource } from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
-
-export type Owner = {
-  id: number;
-  username: string;
-  store_name?: string;
-  store_description?: string;
-  created_at: string;
-  updated_at: string;
-};
-
-export type LoginInfo = {
-  owner: Owner;
-  access_token: string;
-};
-
-export enum MenuType {
-  waffle = "waffle",
-  beverage = "beverage",
-  coffee = "coffee",
-  dessert = "dessert",
-}
-
-export type Menu = {
-  id: number;
-  name: string;
-  type: MenuType;
-  price: number;
-  image?: string;
-  description?: string;
-  rating?: number;
-  owner: Owner;
-};
-
-export type DummyMenu = {
-  id: number;
-  name?: never;
-  type?: never;
-  price?: never;
-  image?: never;
-  description?: never;
-  rating?: never;
-  owner?: never;
-};
-
-export type ApiCreateMenuParams = {
-  name: string;
-  type: MenuType;
-  price: number;
-  image?: string;
-  description?: string;
-};
-
-export type ApiUpdateMenuParams = {
-  price?: number;
-  image?: string | null;
-  description?: string | null;
-};
+import {
+  ApiCreateMenuParams,
+  ApiUpdateMenuParams,
+  LoginInfo,
+  Menu,
+  Owner,
+  Review,
+} from "./types";
 
 const url = (path: string, param?: Record<string, string>) =>
   (process.env.NODE_ENV === "production"
@@ -179,3 +130,49 @@ export const useApiOwnerList = (name: string | null) =>
       }),
     [name]
   );
+
+export function useApiReviewInfScroll(_menu: number, count: number) {
+  const [data, setData] = useState<Review[]>([]);
+  const [from, setFrom] = useState<string | undefined>();
+  const [menu, setMenu] = useState(_menu);
+  const [end, setEnd] = useState(false);
+  const clear = useCallback(() => setData([]), []);
+  useEffect(() => {
+    if (menu !== _menu) {
+      setData([]);
+      setMenu(_menu);
+    }
+  }, [_menu, menu]);
+  const [loading, setLoading] = useState(false);
+  const cancelRef = useRef<CancelTokenSource | null>(null);
+  const cancel = useCallback(() => {
+    cancelRef.current?.cancel();
+  }, []);
+  const next = useCallback(async () => {
+    if (end || loading) return;
+    setLoading(true);
+    cancel();
+    const source = axios.CancelToken.source();
+    cancelRef.current = source;
+    try {
+      const res = await axios.get<{ data: Review[]; next: string }>(
+        url("/reviews/", {
+          menu: menu.toString(),
+          count: count.toString(),
+          ...(from && { from }),
+        }),
+        { cancelToken: source.token }
+      );
+      if (res.data.data.length === 0) {
+        setEnd(true);
+        return;
+      }
+      setData([...data, ...res.data.data]);
+      setFrom(res.data.next);
+    } finally {
+      cancelRef.current = null;
+      setLoading(false);
+    }
+  }, [cancel, count, data, end, from, loading, menu]);
+  return { clear, next, data, cancel, loading };
+}

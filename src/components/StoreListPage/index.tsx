@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { Owner, useApiData, useApiOwnerList } from "../../lib/api";
+import { useApiData, useApiOwnerList } from "../../lib/api";
 import { useMySearchParams } from "../../lib/hooks";
 import SearchBar from "../MenuListPage/SearchBar";
 import styles from "./index.module.scss";
+import { Owner } from "../../lib/types";
 
 export default function StoreListPage() {
   const [search, setSearch] = useMySearchParams("search");

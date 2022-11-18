@@ -1,5 +1,5 @@
 import { createContext, PropsWithChildren, useContext, useState } from "react";
-import { Owner } from "../lib/api";
+import { Owner } from "../lib/types";
 
 const HeaderDataContext = createContext({
   owner: null as Owner | null,

@@ -7,8 +7,6 @@ import { Link, useParams } from "react-router-dom";
 import styles from "./index.module.css";
 import { useSessionContext } from "../../contexts/SessionContext";
 import {
-  DummyMenu,
-  Menu,
   useApiData,
   useApiMenuFetcher,
   useApiMenuListFetcher,
@@ -17,6 +15,7 @@ import {
 import { nanToNull } from "../../lib/formatting";
 import { useMySearchParams } from "../../lib/hooks";
 import { useHeaderDataContext } from "../../contexts/HeaderDataContext";
+import { DummyMenu, Menu } from "../../lib/types";
 
 function useSelectedMenu(ownerId: number | null) {
   const [rawSelectedId, setSelectedId] = useMySearchParams("menu");

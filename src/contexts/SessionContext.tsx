@@ -7,16 +7,10 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  apiLogin,
-  apiLogout,
-  apiMyInfo,
-  apiRefresh,
-  LoginInfo,
-  Owner,
-} from "../lib/api";
+import { apiLogin, apiLogout, apiMyInfo, apiRefresh } from "../lib/api";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { LoginInfo, Owner } from "../lib/types";
 
 const SessionContext = createContext({
   me: null as Owner | null,

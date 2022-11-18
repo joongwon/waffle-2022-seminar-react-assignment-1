@@ -9,7 +9,8 @@ import { Modal, useModal } from "../Modal";
 import DeleteModal from "./DeleteModal";
 import { useCallback, useEffect, useState } from "react";
 import { useSessionContext } from "../../contexts/SessionContext";
-import { apiDeleteMenu, Menu, MenuType } from "../../lib/api";
+import { apiDeleteMenu } from "../../lib/api";
+import { Menu, MenuType } from "../../lib/types";
 import { toast } from "react-toastify";
 
 type MenuDetailsProps = { menu: Menu | null };

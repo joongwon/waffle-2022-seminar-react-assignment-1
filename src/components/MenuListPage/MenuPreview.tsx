@@ -5,7 +5,7 @@ import { formatPrice } from "../../lib/formatting";
 import styles from "./MenuPreview.module.css";
 import { Link } from "react-router-dom";
 import { displayType, Menu, MenuType } from "../../lib/types";
-import { DummyMenu } from "../../lib/api";
+import { DummyMenu } from "../../lib/types";
 
 interface MenuPreviewProps {
   menu: Menu | DummyMenu | null;

@@ -5,6 +5,7 @@
     padding: 20px;
     flex: 1;
     grid-auto-flow: column;
+    overflow-y: clip;
 }
 
 .review-container {
