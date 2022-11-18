@@ -13,10 +13,10 @@ export default function MenuDetailsPage() {
   useEffect(() => {
     menu && setOwner(menu?.owner);
   }, [menu, setOwner]);
-  return menu ? (
+  return (
     <div className={styles["container"]}>
       <Link
-        to={`/stores/${menu.owner.id}?menu=${menuId}`}
+        to={`/stores/${menu?.owner.id}?menu=${menuId}`}
         className={styles["back-link"]}
       >
         <img src={ArrowBackIcon} alt="" width="32px" />
@@ -25,7 +25,5 @@ export default function MenuDetailsPage() {
       <MenuDetails menu={menu} />
       <div className={styles["review-container"]} />
     </div>
-  ) : (
-    <div>존재하지 않는 메뉴입니다</div>
   );
 }
