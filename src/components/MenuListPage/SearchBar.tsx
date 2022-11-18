@@ -23,7 +23,6 @@ export default function SearchBar({ search, setSearch }: SearchBarProps) {
           placeholder="검색어 입력"
           value={input}
           onChange={(e) => {
-            console.log(timeOutTask.current);
             setInput(e.target.value);
             if (!timeOutTask.current)
               setTimeout(() => {

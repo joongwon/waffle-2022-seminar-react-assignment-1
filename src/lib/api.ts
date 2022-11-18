@@ -170,3 +170,12 @@ export const useApiOwnerInfo = (owner: number | null) => {
   );
   return owner === null ? null : f;
 };
+
+export const useApiOwnerList = (name: string | null) =>
+  useCallback(
+    (cancelToken: CancelToken) =>
+      axios.get<Owner[]>(url("/owners/", name ? { name } : undefined), {
+        cancelToken,
+      }),
+    [name]
+  );
