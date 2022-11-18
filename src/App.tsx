@@ -16,7 +16,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<StoreListPage />} />
-        <Route path="stores/:storeId" element={<MenuListPage />} />
+        <Route path="stores/:ownerId" element={<MenuListPage />} />
         <Route path="menus/:menuId" element={<MenuDetailsPage />} />
         <Route path="menus/:menuId/edit" element={<MenuEditPage />} />
         <Route path="menus/new" element={<MenuCreatePage />} />

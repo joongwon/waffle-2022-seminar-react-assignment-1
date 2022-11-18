@@ -1,33 +1,68 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SearchBar from "./SearchBar";
 import MenuList from "./MenuList";
 import addIcon from "../../resources/add-icon.svg";
 import MenuPreview from "./MenuPreview";
-import { useMenuDataContext } from "../../contexts/MenuDataContext";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import styles from "./index.module.css";
-import { nanToNull } from "../../lib/formatting";
 import { useSessionContext } from "../../contexts/SessionContext";
+import {
+  DummyMenu,
+  Menu,
+  useApiData,
+  useApiMenuFetcher,
+  useApiMenuListFetcher,
+} from "../../lib/api";
+import { nanToNull } from "../../lib/formatting";
+
+function useMySearchParams(key: string) {
+  const [searchParams, setParams] = useSearchParams();
+  const search = searchParams.get(key);
+  const setSearch = useCallback(
+    (newValue: string | null) => {
+      setParams((prev) => {
+        const newParams = new URLSearchParams(prev);
+        if (newValue) newParams.set(key, newValue);
+        else newParams.delete(key);
+        return newParams;
+      });
+    },
+    [key, setParams]
+  );
+  return [search, setSearch] as const;
+}
+
+function useSelectedMenu(ownerId: number | null) {
+  const [rawSelectedId, setSelectedId] = useMySearchParams("menu");
+  const selectedId = nanToNull(parseInt(rawSelectedId ?? "NaN"));
+  const [selectedMenu, setSelectedMenu] = useState<Menu | null | DummyMenu>(
+    null
+  );
+  const fetcher = useApiMenuFetcher(selectedId);
+  const { data } = useApiData(fetcher);
+  const select = useCallback(
+    (menu: Menu | null) => {
+      setSelectedId(menu?.id.toString() ?? null);
+      setSelectedMenu(menu);
+    },
+    [setSelectedId]
+  );
+  useEffect(() => {
+    if (!data) return;
+    if (data.owner.id === ownerId) setSelectedMenu(data);
+    else setSelectedMenu(null);
+  }, [data, ownerId]);
+  return { select, selectedMenu };
+}
 
 function MenuListPage() {
-  const [search, setSearch] = useState("");
-  const [searchParams, setParams] = useSearchParams();
-  const selectedId = nanToNull(Number(searchParams.get("menu")));
+  const [search, setSearch] = useMySearchParams("search");
+  const ownerId = nanToNull(parseInt(useParams().ownerId ?? "NaN"));
+  const { selectedMenu, select } = useSelectedMenu(ownerId);
   const { owner } = useSessionContext();
-  function setSelectedId(n: number | null) {
-    if (n === null) setParams({});
-    else setParams({ menu: n.toString() });
-  }
-  const { getMenuById, filterMenus } = useMenuDataContext();
-
-  const selectedMenu = useMemo(
-    () => (selectedId !== null ? getMenuById(selectedId) : null),
-    [getMenuById, selectedId]
-  );
-  const filteredMenus = useMemo(
-    () => filterMenus(search),
-    [filterMenus, search]
-  );
+  const menuListFetcher = useApiMenuListFetcher(ownerId, search);
+  const { data } = useApiData(menuListFetcher);
+  const menus = data?.data ?? null;
 
   return (
     <>
@@ -37,13 +72,18 @@ function MenuListPage() {
         }`}
       >
         <div>
-          <SearchBar search={search} setSearch={setSearch} />
+          <SearchBar
+            search={search ?? ""}
+            setSearch={(newValue) =>
+              setSearch(newValue.length === 0 ? null : newValue)
+            }
+          />
         </div>
         <div className={styles["list-wrapper"]}>
           <MenuList
-            menus={filteredMenus}
-            selectedId={selectedId}
-            setSelectedId={setSelectedId}
+            menus={menus}
+            selectedId={selectedMenu?.id ?? null}
+            select={select}
           />
           {owner && (
             <Link to="/menus/new" className={styles["open-add-modal"]}>
@@ -53,13 +93,13 @@ function MenuListPage() {
         </div>
         <div
           className={`${styles["details-wrapper"]} ${
-            selectedId ? "" : styles["closed"]
+            selectedMenu ? "" : styles["closed"]
           }`}
         >
           <MenuPreview
             menu={selectedMenu}
             onClosePreview={() => {
-              setSelectedId(null);
+              select(null);
             }}
           />
         </div>
