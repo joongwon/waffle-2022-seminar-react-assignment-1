@@ -1,24 +1,29 @@
 import styles from "./index.module.css";
-import { Link, useParams } from "react-router-dom";
-import { useMenuDataContext } from "../../contexts/MenuDataContext";
-import { useMemo } from "react";
+import { useParams } from "react-router-dom";
 import MenuDetails from "./MenuDetails";
 import ArrowBackIcon from "../../resources/arrow-back-icon.svg";
+import { useApiData, useApiMenuFetcher } from "../../lib/api";
+import { useSetHeaderOwner } from "../../contexts/HeaderDataContext";
+import ReviewList from "./ReviewList";
+import { ConditionalLink, RedirectWithMessage, to } from "../../lib/hooks";
+import { axiosErrorStatus } from "../../lib/error";
 
 export default function MenuDetailsPage() {
-  const { getMenuById } = useMenuDataContext();
   const menuId = Number(useParams().menuId);
-  const menu = useMemo(() => getMenuById(menuId), [getMenuById, menuId]);
-  return menu ? (
+  const { data: menu, error } = useApiData(useApiMenuFetcher(menuId));
+  useSetHeaderOwner(menu?.owner ?? null);
+  return axiosErrorStatus(error) === 404 ? (
+    <RedirectWithMessage message="해당하는 아이디의 메뉴가 없습니다" to={-1} />
+  ) : (
     <div className={styles["container"]}>
-      <Link to={`/stores/1?menu=${menuId}`} className={styles["back-link"]}>
+      <ConditionalLink to={to`/stores/${menu?.owner.id}#menu-${menuId}`}>
         <img src={ArrowBackIcon} alt="" width="32px" />
         메뉴 목록
-      </Link>
+      </ConditionalLink>
       <MenuDetails menu={menu} />
-      <div className={styles["review-container"]} />
+      <div className={styles["review-container"]}>
+        <ReviewList menuId={menuId} />
+      </div>
     </div>
-  ) : (
-    <div>존재하지 않는 메뉴입니다</div>
   );
 }

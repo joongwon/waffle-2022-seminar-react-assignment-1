@@ -1,62 +1,84 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { FormEventHandler, useCallback, useId, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useMenuDataContext } from "../../contexts/MenuDataContext";
 import {
   emptyToU,
   formatPrice,
   priceToNum,
   uToEmpty,
 } from "../../lib/formatting";
-import { displayType, MenuCreateInput, MenuType } from "../../lib/types";
+import { displayType, MenuType } from "../../lib/types";
 import { ButtonContainer } from "../ButtonContainer";
 import { Form, InputWithLabel } from "../Form";
 import styles from "./index.module.css";
 import { useSessionContext } from "../../contexts/SessionContext";
+import { apiCreateMenu } from "../../lib/api";
+import { toast } from "react-toastify";
+import { RedirectWithMessage } from "../../lib/hooks";
+import { axiosErrorHandler } from "../../lib/error";
 
-type MenuForm = Omit<MenuCreateInput, "price" | "type"> & {
-  price: number | null;
-  type: MenuType | null;
-};
-
-export default function MenuEditPage() {
-  const { addMenu } = useMenuDataContext();
-  const { user } = useSessionContext();
-  const [menu, setMenu] = useState<MenuForm>({
-    price: null,
-    type: null,
+function useMenuCreatePageLogic() {
+  const { withToken } = useSessionContext();
+  const [editedMenu, setEditedMenu] = useState({
+    price: null as number | null,
+    type: null as MenuType | null,
     name: "",
+    description: undefined as string | undefined,
+    image: undefined as string | undefined,
   });
   const navigate = useNavigate();
-  const dead = useRef(false);
-  useEffect(() => {
-    if (dead.current) return;
-    if (!user) {
-      alert("메뉴를 수정하려면 로그인하세요");
-      navigate("/auth/login", { replace: true });
-      dead.current = true;
-    }
-  }, [dead, navigate, user]);
+  const submitMenu = useCallback<FormEventHandler>(
+    (e) => {
+      e.preventDefault();
+      const { name, price, type, image, description } = editedMenu;
+      if (!type || !name || !price) {
+        toast.warning("메뉴의 타입, 이름, 가격을 지정해주세요");
+        return;
+      }
+      withToken((token) =>
+        apiCreateMenu({ name, price, type, image, description }, token)
+      )
+        .then((newMenu) => {
+          if (newMenu.canceled) return;
+          toast.success("새 메뉴를 생성하였습니다");
+          navigate(`/menus/${newMenu.payload.data.id}`);
+        })
+        .catch(axiosErrorHandler("새 메뉴를 생성할 수 없습니다"));
+    },
+    [editedMenu, navigate, withToken]
+  );
+  return { submitMenu, editedMenu, setEditedMenu };
+}
+
+export default function MenuCreatePage() {
+  const { me, loading } = useSessionContext();
   const id = useId();
-  return (
+  const { submitMenu, editedMenu, setEditedMenu } = useMenuCreatePageLogic();
+  return !loading && !me ? (
+    <RedirectWithMessage
+      message="메뉴를 생성하려면 로그인하세요"
+      to="/auth/login"
+    />
+  ) : (
     <div className={styles["container"]}>
-      <Form className={styles["form"]}>
+      <Form className={styles["form"]} onSubmit={submitMenu}>
         <h2>메뉴 추가</h2>
         <InputWithLabel
-          value={menu}
+          value={editedMenu}
           label="이름"
           name="name"
-          setValue={setMenu}
+          setValue={setEditedMenu}
           placeholder="맛있는와플"
+          required
         />
         <label htmlFor={id}>종류</label>
         <select
           onChange={(e) =>
-            setMenu({
-              ...menu,
+            setEditedMenu({
+              ...editedMenu,
               type: e.target.value === "" ? null : (e.target.value as MenuType),
             })
           }
-          value={menu.type ?? ""}
+          value={editedMenu.type ?? ""}
           required
         >
           <option value="" disabled>
@@ -69,19 +91,22 @@ export default function MenuEditPage() {
           ))}
         </select>
         <InputWithLabel
-          value={menu}
+          value={editedMenu}
           label="가격"
           name="price"
-          setValue={setMenu}
-          stringToProp={(s) => (s === "" ? null : priceToNum(s) ?? menu.price)}
+          setValue={setEditedMenu}
+          stringToProp={(s) => {
+            return s !== "" ? priceToNum(s) ?? editedMenu.price : null;
+          }}
           propToString={(p) => (p === null ? "" : formatPrice(p))}
           placeholder="9,000"
           suffix="원"
+          required
         />
         <InputWithLabel
           textarea
-          value={menu}
-          setValue={setMenu}
+          value={editedMenu}
+          setValue={setEditedMenu}
           label="설명"
           name="description"
           stringToProp={emptyToU}
@@ -89,35 +114,21 @@ export default function MenuEditPage() {
           placeholder="설명을 입력하세요"
         />
         <InputWithLabel
-          value={menu}
+          value={editedMenu}
           label="이미지"
           name="image"
-          setValue={setMenu}
+          setValue={setEditedMenu}
           stringToProp={emptyToU}
           propToString={uToEmpty}
           placeholder="https://example.com/foo.png"
         />
+        <ButtonContainer>
+          <button type="submit" className={styles["green"]}>
+            저장
+          </button>
+          <Link to="/stores/1">취소</Link>
+        </ButtonContainer>
       </Form>
-      <ButtonContainer>
-        <button
-          onClick={() => {
-            const { price, type } = menu;
-            if (price === null) {
-              alert("invalid price");
-              return;
-            } else if (type === null) {
-              alert("invalid type");
-              return;
-            }
-            const newMenu = addMenu({ ...menu, price, type });
-            navigate(`/menus/${newMenu.id}`);
-          }}
-          className={styles["green"]}
-        >
-          저장
-        </button>
-        <Link to="/stores/1">취소</Link>
-      </ButtonContainer>
     </div>
   );
 }

@@ -4,10 +4,12 @@ import imagePlaceholder from "../../resources/image-placeholder.png";
 import { formatPrice } from "../../lib/formatting";
 import styles from "./MenuPreview.module.css";
 import { Link } from "react-router-dom";
-import { displayType, Menu } from "../../lib/types";
+import { displayType, Menu, MenuType } from "../../lib/types";
+import { DummyMenu } from "../../lib/types";
 
 interface MenuPreviewProps {
-  menu: Menu | null;
+  menu: Menu | DummyMenu | null;
+
   onClosePreview(): void;
 }
 
@@ -15,7 +17,7 @@ export default function MenuPreview({
   menu: menuInput,
   onClosePreview,
 }: MenuPreviewProps) {
-  const [menu, setMenu] = useState<Menu | null>(null);
+  const [menu, setMenu] = useState<typeof menuInput>(null);
   useEffect(() => {
     if (menuInput) {
       setMenu(menuInput);
@@ -38,12 +40,13 @@ export default function MenuPreview({
         </button>
         <div className={styles["info-container"]}>
           <img
-            src={menu.image ? menu.image : imagePlaceholder}
+            src={menu.image ?? imagePlaceholder}
+            onError={() => setMenu({ ...menu, image: imagePlaceholder })}
             alt="상품 이미지"
           />
-          <h3>{menu.name}</h3>
-          <p>{formatPrice(menu.price)}원</p>
-          <p>{displayType(menu.type)}</p>
+          <h3>{menu.name ?? "맛있는 와플"}</h3>
+          <p>{formatPrice(menu.price ?? 0)}원</p>
+          <p>{displayType(menu.type ?? MenuType.waffle)}</p>
           <Link className={styles["link-details"]} to={`/menus/${menu.id}`}>
             자세히 보기
           </Link>

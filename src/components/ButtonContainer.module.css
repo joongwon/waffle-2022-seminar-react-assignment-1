@@ -1,6 +1,8 @@
 .button-container {
     display: flex;
     margin: 5px;
+    grid-column: 1/3;
+    justify-content: center;
 }
 
 .button-container button,
