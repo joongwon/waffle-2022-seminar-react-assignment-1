@@ -1,37 +1,25 @@
 import styles from "./index.module.css";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import MenuDetails from "./MenuDetails";
 import ArrowBackIcon from "../../resources/arrow-back-icon.svg";
 import { useApiData, useApiMenuFetcher } from "../../lib/api";
-import { useEffect } from "react";
-import { useHeaderDataContext } from "../../contexts/HeaderDataContext";
+import { useSetHeaderOwner } from "../../contexts/HeaderDataContext";
 import ReviewList from "./ReviewList";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { ConditionalLink, RedirectWithMessage, to } from "../../lib/hooks";
+import { axiosErrorStatus } from "../../lib/error";
 
 export default function MenuDetailsPage() {
   const menuId = Number(useParams().menuId);
-  const { setOwner } = useHeaderDataContext();
   const { data: menu, error } = useApiData(useApiMenuFetcher(menuId));
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (error && axios.isAxiosError(error) && error.response?.status === 404) {
-      toast.warning("존재하지 않는 메뉴입니다");
-      navigate(-1);
-    }
-  }, [error, navigate]);
-  useEffect(() => {
-    menu && setOwner(menu?.owner);
-  }, [menu, setOwner]);
-  return (
+  useSetHeaderOwner(menu?.owner ?? null);
+  return axiosErrorStatus(error) === 404 ? (
+    <RedirectWithMessage message="해당하는 아이디의 메뉴가 없습니다" to={-1} />
+  ) : (
     <div className={styles["container"]}>
-      <Link
-        to={`/stores/${menu?.owner.id}?menu=${menuId}`}
-        className={styles["back-link"]}
-      >
+      <ConditionalLink to={to`/stores/${menu?.owner.id}#menu-${menuId}`}>
         <img src={ArrowBackIcon} alt="" width="32px" />
         메뉴 목록
-      </Link>
+      </ConditionalLink>
       <MenuDetails menu={menu} />
       <div className={styles["review-container"]}>
         <ReviewList menuId={menuId} />

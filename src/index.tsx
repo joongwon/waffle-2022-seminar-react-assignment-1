@@ -10,3 +10,5 @@ root.render(
   </React.StrictMode>
 );
 export { useMySearchParams } from "./lib/hooks";
+export { useRedirectWithMessage } from "./lib/hooks";
+export { ConditionalLink } from "./lib/hooks";

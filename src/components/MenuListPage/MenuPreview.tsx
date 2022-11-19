@@ -44,7 +44,7 @@ export default function MenuPreview({
             onError={() => setMenu({ ...menu, image: imagePlaceholder })}
             alt="상품 이미지"
           />
-          <h3>{menu.name ?? "로딩중..."}</h3>
+          <h3>{menu.name ?? "맛있는 와플"}</h3>
           <p>{formatPrice(menu.price ?? 0)}원</p>
           <p>{displayType(menu.type ?? MenuType.waffle)}</p>
           <Link className={styles["link-details"]} to={`/menus/${menu.id}`}>

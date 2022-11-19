@@ -7,15 +7,16 @@ import {
 import { Review } from "../../lib/types";
 import { InView } from "react-intersection-observer";
 import styles from "./ReviewList.module.scss";
-import axios from "axios";
 import { toast } from "react-toastify";
 import Moment from "react-moment";
 import "moment/locale/ko";
 import { Rating } from "react-simple-star-rating";
 import { useSessionContext } from "../../contexts/SessionContext";
-import { FormEventHandler, useCallback, useEffect, useState } from "react";
+import { FormEventHandler, useCallback, useState } from "react";
 import { Modal, useModal } from "../Modal";
 import DeleteModal from "./DeleteModal";
+import { axiosErrorHandler } from "../../lib/error";
+import { useEffectMountOrChange } from "../../lib/hooks";
 
 export default function ReviewList({ menuId }: { menuId: number }) {
   const {
@@ -23,17 +24,12 @@ export default function ReviewList({ menuId }: { menuId: number }) {
     next,
     refresh: rawRefresh,
   } = useApiReviewInfScroll(menuId, 10);
-  const refresh = useCallback(
-    () =>
-      void rawRefresh().catch((err) => {
-        const message = axios.isAxiosError(err) && err.response?.data.message;
-        toast.error(`리뷰를 불러올 수 없습니다${message && `:${message}`}`);
-      }),
-    [rawRefresh]
-  );
-  useEffect(() => {
+  const refresh = useCallback(() => {
+    rawRefresh().catch(axiosErrorHandler("리뷰를 불러올 수 없습니다"));
+  }, [rawRefresh]);
+  useEffectMountOrChange(() => {
     refresh();
-  }, [refresh]);
+  }, [menuId]);
   const { withToken } = useSessionContext();
   const createReview = useCallback(
     (content: string, rating: number) => {
@@ -41,13 +37,11 @@ export default function ReviewList({ menuId }: { menuId: number }) {
         .then(() => {
           refresh();
         })
-        .catch((err) => {
-          const message = axios.isAxiosError(err) && err.response?.data.message;
-          toast.error(`리뷰를 작성할 수 없습니다${message && `:${message}`}`);
-        });
+        .catch(axiosErrorHandler("리뷰를 작성할 수 없습니다"));
     },
     [menuId, refresh, withToken]
   );
+  const { me } = useSessionContext();
   return (
     <div className={styles.wrapper}>
       <ul className={styles.list}>
@@ -61,17 +55,11 @@ export default function ReviewList({ menuId }: { menuId: number }) {
         <InView
           onChange={(inView) => {
             if (inView)
-              next().catch((err) => {
-                const message =
-                  axios.isAxiosError(err) && err.response?.data.message;
-                toast.error(
-                  `리뷰를 불러올 수 없습니다${message && `:${message}`}`
-                );
-              });
+              next().catch(axiosErrorHandler("리뷰를 불러올 수 없습니다"));
           }}
         />
       </ul>
-      <ReviewForm onSave={createReview} />
+      {me && <ReviewForm onSave={createReview} />}
     </div>
   );
 }
@@ -92,10 +80,7 @@ function ReviewDisplay({
         toast.success("리뷰를 삭제했습니다");
         return refresh();
       })
-      .catch((err) => {
-        const message = axios.isAxiosError(err) && err.response?.data.message;
-        toast.error(`리뷰를 삭제할 수 없습니다: ${message}`);
-      });
+      .catch(axiosErrorHandler("리뷰를 삭제할 수 없습니다"));
   }, [refresh, review.id, withToken]);
   const updateReview = useCallback(
     (content: string, rating: number) => {
@@ -105,10 +90,7 @@ function ReviewDisplay({
           setIsForm(false);
           return refresh();
         })
-        .catch((err) => {
-          const message = axios.isAxiosError(err) && err.response?.data.message;
-          toast.error(`리뷰를 수정할 수 없습니다: ${message}`);
-        });
+        .catch(axiosErrorHandler("리뷰를 수정할 수 없습니다"));
     },
     [refresh, review.id, withToken]
   );
@@ -160,7 +142,6 @@ function ReviewForm({
   onCancel?: () => void;
   initialData?: Review;
 }) {
-  const { me } = useSessionContext();
   const [content, setContent] = useState(initialData?.content ?? "");
   const [rating, setRating] = useState(initialData?.rating ?? 10);
   const submitReview = useCallback<FormEventHandler>(
@@ -173,22 +154,17 @@ function ReviewForm({
     [onSave, content, rating]
   );
   return (
-    me && (
-      <form onSubmit={submitReview}>
-        <Rating
-          initialValue={rating / 2}
-          onClick={(value) => setRating(value * 2)}
-          size={20}
-          fillColor="#F0975E"
-          allowFraction
-        />
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
-        <button type="submit">저장</button>
-        {onCancel && <button onClick={() => onCancel()}>취소</button>}
-      </form>
-    )
+    <form onSubmit={submitReview}>
+      <Rating
+        initialValue={rating / 2}
+        onClick={(value) => setRating(value * 2)}
+        size={20}
+        fillColor="#F0975E"
+        allowFraction
+      />
+      <textarea value={content} onChange={(e) => setContent(e.target.value)} />
+      <button type="submit">저장</button>
+      {onCancel && <button onClick={() => onCancel()}>취소</button>}
+    </form>
   );
 }

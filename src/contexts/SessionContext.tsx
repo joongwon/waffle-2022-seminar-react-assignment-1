@@ -3,96 +3,111 @@ import {
   PropsWithChildren,
   useCallback,
   useContext,
-  useEffect,
   useRef,
   useState,
 } from "react";
 import { apiLogin, apiLogout, apiMyInfo, apiRefresh } from "../lib/api";
-import axios from "axios";
+import axios, { CancelTokenSource } from "axios";
 import { toast } from "react-toastify";
-import { LoginInfo, Owner } from "../lib/types";
+import { Canceled, LoginInfo, Owner } from "../lib/types";
+import { axiosErrorStatus } from "../lib/error";
+import { useEffectMountOrChange } from "../lib/hooks";
 
 const SessionContext = createContext({
   me: null as Owner | null,
   loading: false,
-  withToken<T>(_req: (token: string) => Promise<T>): Promise<T | null> {
+  withToken<T>(req: (token: string) => Promise<T>): Promise<Canceled<T>> {
+    void req;
     throw new Error("SessionContext not provided");
   },
   logout(): Promise<void> {
     throw new Error("SessionContext not provided");
   },
-  login(_username: string, _password: string): Promise<Owner> {
+  login(username: string, password: string): Promise<Canceled<Owner>> {
+    void username;
+    void password;
     throw new Error("SessionContext not provided");
   },
 });
 
 export function SessionProvider({ children }: PropsWithChildren) {
-  const [loginInfo, setLoginInfo] = useState<LoginInfo | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [{ loginInfo, loading }, setResult] = useState({
+    loginInfo: null as LoginInfo | null,
+    loading: false,
+  });
   const refreshRef = useRef<Promise<string | null> | null>(null);
   const refresh = useCallback(() => {
     if (!refreshRef.current) {
-      setLoading(true);
-      refreshRef.current = (async () => {
-        try {
-          const res = await apiRefresh();
+      setResult((prev) => ({ ...prev, loading: true }));
+      refreshRef.current = apiRefresh()
+        .then(async (res) => {
           const token = res.data.access_token;
           const {
             data: { owner },
           } = await apiMyInfo(token);
-          setLoginInfo({ owner, access_token: token });
+          setResult({
+            loginInfo: { owner, access_token: token },
+            loading: false,
+          });
           refreshRef.current = null;
           return token;
-        } catch (reason) {
-          if (!axios.isAxiosError(reason)) throw reason;
-          setLoginInfo(null);
+        })
+        .catch((reason) => {
+          setResult({ loginInfo: null, loading: false });
           refreshRef.current = null;
+          if (axiosErrorStatus(reason) !== 401) throw reason;
           return null;
-        } finally {
-          setLoading(false);
-        }
-      })();
+        });
     }
     return refreshRef.current;
   }, []);
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  useEffectMountOrChange(() => refresh(), []);
   const withToken = useCallback(
-    async function <T>(req: (token: string) => Promise<T>): Promise<T | null> {
+    async function <T>(
+      req: (token: string) => Promise<T>,
+      alert?: boolean
+    ): Promise<Canceled<T>> {
       const token = loginInfo?.access_token;
       if (!token) {
-        toast.warning("먼저 로그인하세요");
-        return null;
+        alert && toast.warning("먼저 로그인하세요");
+        return { canceled: true };
       }
       try {
-        return await req(token);
+        return { payload: await req(token) };
       } catch (e) {
         console.log(e);
         if (!(axios.isAxiosError(e) && e.status === 401)) throw e;
       }
       const newToken = await refresh();
       if (!newToken) {
-        toast.warning("먼저 로그인하세요");
-        return null;
+        alert && toast.warning("먼저 로그인하세요");
+        return { canceled: true };
       }
-      return await req(newToken);
+      return { payload: await req(token) };
     },
     [loginInfo?.access_token, refresh]
   );
   const logout = useCallback(async () => {
-    loginInfo && apiLogout(loginInfo.access_token).catch();
-    setLoginInfo(null);
-  }, [loginInfo]);
+    withToken((token) => apiLogout(token), false);
+    setResult({ loginInfo: null, loading: false });
+  }, [withToken]);
+  const loginCancelSource = useRef<CancelTokenSource | null>(null);
   const login = useCallback(async (username: string, password: string) => {
-    setLoading(true);
-    try {
-      const { data } = await apiLogin(username, password);
-      setLoginInfo(data);
-      return data.owner;
-    } finally {
-      setLoading(false);
-    }
+    loginCancelSource.current?.cancel();
+    setResult((prev) => ({ ...prev, loading: true }));
+    loginCancelSource.current = axios.CancelToken.source();
+    return apiLogin(username, password, loginCancelSource.current.token)
+      .then((res) => {
+        setResult({ loginInfo: res.data, loading: false });
+        return { payload: res.data.owner };
+      })
+      .catch((err) => {
+        if (axios.isCancel(err)) return { canceled: true } as const;
+        throw err;
+      })
+      .finally(() => {
+        loginCancelSource.current = null;
+      });
   }, []);
   return (
     <SessionContext.Provider

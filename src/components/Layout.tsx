@@ -18,7 +18,7 @@ export default function Layout() {
           {owner ? (
             <Link to={`/stores/${owner.id}`} className={styles["store-name"]}>
               <h3>와플스튜디오 메뉴 관리</h3>
-              <h1>{owner.store_name || "이름없는가게"}</h1>
+              <h1>{owner.store_name ?? "이름없는가게"}</h1>
               <h2>by {owner.username}</h2>
             </Link>
           ) : (

@@ -16,11 +16,15 @@ const url = (path: string, param?: Record<string, string>) =>
 
 const auth = (token: string) => ({ Authorization: `Bearer ${token}` });
 
-export const apiLogin = (username: string, password: string) =>
+export const apiLogin = (
+  username: string,
+  password: string,
+  cancelToken?: CancelToken
+) =>
   axios.post<LoginInfo>(
     url("/auth/login"),
     { username, password },
-    { withCredentials: true }
+    { withCredentials: true, cancelToken }
   );
 
 export const apiLogout = (token: string) =>
@@ -171,10 +175,10 @@ export function useApiReviewInfScroll(menu: number, count: number) {
   const cancelRef = useRef<CancelTokenSource | null>(null);
   const fetch = useApiReviewList(menu, count);
   const next = useCallback(() => {
-    if (loading || isEnd) return;
+    if (loading || isEnd) return Promise.resolve();
     const source = (cancelRef.current = axios.CancelToken.source());
     setResult((prev) => ({ ...prev, loading: true }));
-    fetch(from, source.token)
+    return fetch(from, source.token)
       .then((res) => {
         setResult((prev) => ({
           data: [...prev.data, ...res.data.data],
@@ -191,7 +195,7 @@ export function useApiReviewInfScroll(menu: number, count: number) {
           loading: false,
         }));
       })
-      .catch(() => {
+      .finally(() => {
         cancelRef.current = null;
       });
   }, [loading, isEnd, fetch, from]);
@@ -200,7 +204,7 @@ export function useApiReviewInfScroll(menu: number, count: number) {
     cancelRef.current?.cancel();
     const source = (cancelRef.current = axios.CancelToken.source());
     setResult((prev) => ({ ...prev, loading: true }));
-    fetch(undefined, source.token)
+    return fetch(undefined, source.token)
       .then((res) => {
         setResult({
           data: [...res.data.data],

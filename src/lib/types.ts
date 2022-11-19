@@ -116,3 +116,7 @@ export function displayType(type: MenuType) {
       return never(type);
   }
 }
+
+export type Canceled<T> =
+  | { payload: T; canceled?: undefined }
+  | { canceled: true };

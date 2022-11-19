@@ -3,7 +3,7 @@ import SearchBar from "./SearchBar";
 import MenuList from "./MenuList";
 import addIcon from "../../resources/add-icon.svg";
 import MenuPreview from "./MenuPreview";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import styles from "./index.module.css";
 import { useSessionContext } from "../../contexts/SessionContext";
 import {
@@ -13,15 +13,28 @@ import {
   useApiOwnerInfo,
 } from "../../lib/api";
 import { nanToNull } from "../../lib/formatting";
-import { useMySearchParams } from "../../lib/hooks";
-import { useHeaderDataContext } from "../../contexts/HeaderDataContext";
+import { RedirectWithMessage, to, useMySearchParams } from "../../lib/hooks";
+import { useSetHeaderOwner } from "../../contexts/HeaderDataContext";
 import { DummyMenu, Menu } from "../../lib/types";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { axiosErrorStatus } from "../../lib/error";
+
+function useHashMenu() {
+  const hash = useLocation().hash;
+  const selectedId = hash.startsWith("#menu-")
+    ? nanToNull(parseInt(hash.substring("#menu-".length)))
+    : null;
+  const navigate = useNavigate();
+  const setSelectedId = useCallback(
+    (newSelectedId: number | null) => {
+      navigate({ hash: to`#menu-${newSelectedId ?? undefined}` ?? undefined });
+    },
+    [navigate]
+  );
+  return [selectedId, setSelectedId] as const;
+}
 
 function useSelectedMenu(ownerId: number | null) {
-  const [rawSelectedId, setSelectedId] = useMySearchParams("menu");
-  const selectedId = nanToNull(parseInt(rawSelectedId ?? "NaN"));
+  const [selectedId, setSelectedId] = useHashMenu();
   const [selectedMenu, setSelectedMenu] = useState<Menu | null | DummyMenu>(
     selectedId ? { id: selectedId } : null
   );
@@ -29,7 +42,7 @@ function useSelectedMenu(ownerId: number | null) {
   const { data } = useApiData(fetcher);
   const select = useCallback(
     (menu: Menu | null) => {
-      setSelectedId(menu?.id.toString() ?? null);
+      setSelectedId(menu?.id ?? null);
       setSelectedMenu(menu);
     },
     [setSelectedId]
@@ -45,7 +58,6 @@ function useSelectedMenu(ownerId: number | null) {
 function MenuListPage() {
   const [search, setSearch] = useMySearchParams("search");
   const ownerId = nanToNull(parseInt(useParams().ownerId ?? "NaN"));
-  const navigate = useNavigate();
   const { selectedMenu, select } = useSelectedMenu(ownerId);
   const { me } = useSessionContext();
   const { data: menusData } = useApiData(
@@ -55,25 +67,11 @@ function MenuListPage() {
   const { data: ownerData, error: ownerError } = useApiData(
     useApiOwnerInfo(ownerId)
   );
-  const { setOwner } = useHeaderDataContext();
-  useEffect(() => {
-    if (!ownerId) {
-      toast.warning("잘못된 주소입니다");
-      navigate(-1);
-    }
-  }, [navigate, ownerId]);
-  useEffect(() => {
-    const err = ownerError?.payload;
-    console.log(err);
-    if (err && axios.isAxiosError(err) && err.response?.status === 404) {
-      toast.warning("존재하지 않는 가게입니다");
-      navigate(-1);
-    }
-  }, [navigate, ownerError?.payload]);
-  useEffect(() => {
-    ownerData && setOwner(ownerData?.owner);
-  }, [ownerData, setOwner]);
-
+  useSetHeaderOwner(ownerData?.owner ?? null);
+  if (!ownerId)
+    return <RedirectWithMessage message="잘못된 주소입니다" to={-1} />;
+  if (axiosErrorStatus(ownerError?.payload) === 404)
+    return <RedirectWithMessage message="존재하지 않는 가게입니다" to={-1} />;
   return (
     <>
       <div
@@ -108,9 +106,7 @@ function MenuListPage() {
         >
           <MenuPreview
             menu={selectedMenu}
-            onClosePreview={() => {
-              select(null);
-            }}
+            onClosePreview={() => select(null)}
           />
         </div>
       </div>

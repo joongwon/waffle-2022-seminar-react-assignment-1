@@ -1,41 +1,35 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { formatPrice, nanToNull, priceToNum } from "../../lib/formatting";
-import { displayType } from "../../lib/types";
+import { displayType, Menu, MenuType } from "../../lib/types";
 import { ButtonContainer } from "../ButtonContainer";
 import { Form, InputWithLabel, StaticField } from "../Form";
 import styles from "./index.module.css";
 import { useSessionContext } from "../../contexts/SessionContext";
 import { apiUpdateMenu, useApiData, useApiMenuFetcher } from "../../lib/api";
 import { toast } from "react-toastify";
-import axios from "axios";
+import { ConditionalLink, RedirectWithMessage, to } from "../../lib/hooks";
+import { axiosErrorHandler, axiosErrorStatus } from "../../lib/error";
 
 function useMenuEditPageLogic() {
   const menuId = nanToNull(parseInt(useParams().menuId ?? "NaN"));
   const navigate = useNavigate();
-  const { me, withToken, loading: meLoading } = useSessionContext();
-  const { data: oldMenu, loading: menuLoading } = useApiData(
-    useApiMenuFetcher(menuId)
-  );
-  useEffect(() => {
-    if (!meLoading && !me) {
-      toast.warning("메뉴를 수정하려면 먼저 로그인하세요");
-      navigate("/auth/login", { replace: true });
-    } else if (!meLoading && !menuLoading && me?.id !== oldMenu?.owner.id) {
-      toast.warning("내 가게의 메뉴가 아닙니다");
-      navigate(`/menus/${oldMenu?.id}`, { replace: true });
-    }
-  }, [navigate, oldMenu, me, meLoading, menuLoading]);
-  const [menu, setMenu] = useState<{
+  const { withToken } = useSessionContext();
+  const {
+    data: oldMenu,
+    loading: menuLoading,
+    error,
+  } = useApiData(useApiMenuFetcher(menuId));
+  const [editedMenu, setEditedMenu] = useState<{
     price?: number | null;
     image?: string | null;
     description?: string | null;
   }>({});
   const submitMenu = useCallback(() => {
     if (!oldMenu) return;
-    const { price, image, description } = menu;
+    const { price, image, description } = editedMenu;
     if (price === null) {
-      toast.error("invalid price");
+      toast.error("가격을 입력하세요");
       return;
     }
     withToken((token) =>
@@ -46,34 +40,88 @@ function useMenuEditPageLogic() {
         toast.success("메뉴를 저장했습니다");
         navigate(`/menus/${oldMenu.id}`);
       })
-      .catch((err) => {
-        const message = axios.isAxiosError(err) && err.response?.data.message;
-        if (message) toast.error("메뉴를 저장할 수 없습니다: " + message);
-        else throw err;
-      });
-  }, [menu, navigate, oldMenu, withToken]);
-  return { submitMenu, setMenu, menu, oldMenu };
+      .catch(axiosErrorHandler("메뉴를 저장할 수 없습니다"));
+  }, [editedMenu, navigate, oldMenu, withToken]);
+  return {
+    submitMenu,
+    setEditedMenu,
+    editedMenu,
+    oldMenu,
+    error: error?.payload,
+    menuLoading,
+    menuId,
+  };
+}
+
+function useCheckRedirect(
+  menuLoading: boolean,
+  oldMenu?: Menu,
+  error?: unknown
+) {
+  const { me, loading: meLoading } = useSessionContext();
+  return {
+    notLoggedIn: !meLoading && !me,
+    notMyMenu: !meLoading && !menuLoading && me?.id !== oldMenu?.owner.id,
+    menuNotFound: axiosErrorStatus(error) === 404,
+  };
 }
 
 export default function MenuEditPage() {
-  const { submitMenu, setMenu, menu, oldMenu } = useMenuEditPageLogic();
-  return menu && oldMenu ? (
+  const {
+    submitMenu,
+    setEditedMenu,
+    editedMenu,
+    oldMenu,
+    error,
+    menuLoading,
+    menuId,
+  } = useMenuEditPageLogic();
+  const { notLoggedIn, notMyMenu, menuNotFound } = useCheckRedirect(
+    menuLoading,
+    oldMenu,
+    error
+  );
+  if (notLoggedIn)
+    return (
+      <RedirectWithMessage
+        message={"메뉴를 수정하려면 먼저 로그인하세요"}
+        to="/auth/login"
+      />
+    );
+  if (notMyMenu)
+    return (
+      <RedirectWithMessage
+        message="내 메뉴가 아닙니다"
+        to={`/menus/${menuId}`}
+      />
+    );
+  if (menuNotFound)
+    return (
+      <RedirectWithMessage
+        message={"해당 아이디의 메뉴가 존재하지 않습니다"}
+        to={-1}
+      />
+    );
+  return (
     <div className={styles["container"]}>
       <Form className={styles["form"]}>
         <h2>메뉴 수정</h2>
-        <StaticField value={oldMenu.name} label="이름" />
-        <StaticField value={displayType(oldMenu.type)} label="종류" />
+        <StaticField value={oldMenu?.name ?? "맛있는와플"} label="이름" />
+        <StaticField
+          value={displayType(oldMenu?.type ?? MenuType.waffle)}
+          label="종류"
+        />
         <InputWithLabel
-          value={menu}
+          value={editedMenu}
           label="가격"
           name="price"
-          setValue={setMenu}
+          setValue={setEditedMenu}
           stringToProp={(s) =>
-            (s === "" ? null : priceToNum(s) ?? menu.price) ?? null
+            (s === "" ? null : priceToNum(s) ?? editedMenu.price) ?? null
           }
           propToString={(p) =>
             p === undefined
-              ? formatPrice(oldMenu.price)
+              ? formatPrice(oldMenu?.price ?? 0)
               : p === null
               ? ""
               : formatPrice(p)
@@ -83,23 +131,23 @@ export default function MenuEditPage() {
         />
         <InputWithLabel
           textarea
-          value={menu}
-          setValue={setMenu}
+          value={editedMenu}
+          setValue={setEditedMenu}
           label="설명"
           name="description"
           stringToProp={(s) => (s === "" ? null : s)}
           propToString={(p) =>
-            (p === undefined ? oldMenu.description : p) ?? ""
+            (p === undefined ? oldMenu?.description : p) ?? ""
           }
           placeholder="설명을 입력하세요"
         />
         <InputWithLabel
-          value={menu}
+          value={editedMenu}
           label="이미지"
           name="image"
-          setValue={setMenu}
+          setValue={setEditedMenu}
           stringToProp={(s) => (s === "" ? null : s)}
-          propToString={(p) => (p === undefined ? oldMenu.image : p) ?? ""}
+          propToString={(p) => (p === undefined ? oldMenu?.image : p) ?? ""}
           placeholder="https://example.com/foo.png"
         />
       </Form>
@@ -107,10 +155,8 @@ export default function MenuEditPage() {
         <button onClick={submitMenu} className={styles["green"]}>
           저장
         </button>
-        <Link to={`/menus/${oldMenu.id}`}>취소</Link>
+        <ConditionalLink to={to`/menus/${oldMenu?.id}`}>취소</ConditionalLink>
       </ButtonContainer>
     </div>
-  ) : (
-    <div>메뉴가 존재하지 않습니다</div>
   );
 }
