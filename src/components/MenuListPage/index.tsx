@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import SearchBar from "./SearchBar";
 import MenuList from "./MenuList";
 import addIcon from "../../resources/add-icon.svg";
@@ -13,7 +13,12 @@ import {
   useApiOwnerInfo,
 } from "../../lib/api";
 import { nanToNull } from "../../lib/formatting";
-import { RedirectWithMessage, to, useMySearchParams } from "../../lib/hooks";
+import {
+  RedirectWithMessage,
+  to,
+  useMySearchParams,
+  useSyncedState,
+} from "../../lib/hooks";
 import { useSetHeaderOwner } from "../../contexts/HeaderDataContext";
 import { DummyMenu, Menu } from "../../lib/types";
 import { axiosErrorStatus } from "../../lib/error";
@@ -35,23 +40,27 @@ function useHashMenu() {
 
 function useSelectedMenu(ownerId: number | null) {
   const [selectedId, setSelectedId] = useHashMenu();
-  const [selectedMenu, setSelectedMenu] = useState<Menu | null | DummyMenu>(
-    selectedId ? { id: selectedId } : null
+  const { data, error } = useApiData(useApiMenuFetcher(selectedId));
+  const dummy = useMemo(
+    () => (selectedId ? { id: selectedId } : null),
+    [selectedId]
   );
-  const fetcher = useApiMenuFetcher(selectedId);
-  const { data } = useApiData(fetcher);
+  const [selectedMenu, setSelectedMenu] = useSyncedState<
+    Menu | null | DummyMenu
+  >(data ?? dummy);
   const select = useCallback(
     (menu: Menu | null) => {
-      setSelectedId(menu?.id ?? null);
       setSelectedMenu(menu);
+      setSelectedId(menu?.id ?? null);
     },
-    [setSelectedId]
+    [setSelectedId, setSelectedMenu]
   );
   useEffect(() => {
-    if (!data) return;
-    if (data.owner.id === ownerId) setSelectedMenu(data);
-    else setSelectedMenu(null);
-  }, [data, ownerId]);
+    const invalidOwner =
+      ownerId && selectedMenu?.owner && selectedMenu.owner.id !== ownerId;
+    const menuNotFound = axiosErrorStatus(error?.payload) === 404;
+    if (invalidOwner || menuNotFound) select(null);
+  }, [error, ownerId, select, selectedMenu]);
   return { select, selectedMenu };
 }
 
