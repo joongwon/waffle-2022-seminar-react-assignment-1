@@ -42,6 +42,7 @@ function useMenuEditPageLogic() {
       })
       .catch(axiosErrorHandler("메뉴를 저장할 수 없습니다"));
   }, [editedMenu, navigate, oldMenu, withToken]);
+  console.log("data.name: ", oldMenu?.name, "loading: ", menuLoading);
   return {
     submitMenu,
     setEditedMenu,
@@ -59,9 +60,11 @@ function useCheckRedirect(
   error?: unknown
 ) {
   const { me, loading: meLoading } = useSessionContext();
+  console.log("my id: ", me?.id, "menu owner id: ", oldMenu?.owner.id);
   return {
     notLoggedIn: !meLoading && !me,
-    notMyMenu: !meLoading && !menuLoading && me?.id !== oldMenu?.owner.id,
+    notMyMenu:
+      !meLoading && !menuLoading && me && oldMenu && me.id !== oldMenu.owner.id,
     menuNotFound: axiosErrorStatus(error) === 404,
   };
 }

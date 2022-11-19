@@ -41,13 +41,14 @@ function useHashMenu() {
 function useSelectedMenu(ownerId: number | null) {
   const [selectedId, setSelectedId] = useHashMenu();
   const { data, error } = useApiData(useApiMenuFetcher(selectedId));
-  const dummy = useMemo(
-    () => (selectedId ? { id: selectedId } : null),
-    [selectedId]
-  );
   const [selectedMenu, setSelectedMenu] = useSyncedState<
     Menu | null | DummyMenu
-  >(data ?? dummy);
+  >(
+    useMemo(
+      () => (selectedId ? data ?? { id: selectedId } : null),
+      [data, selectedId]
+    )
+  );
   const select = useCallback(
     (menu: Menu | null) => {
       setSelectedMenu(menu);

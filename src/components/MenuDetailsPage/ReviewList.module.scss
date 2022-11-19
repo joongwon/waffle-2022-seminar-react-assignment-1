@@ -4,6 +4,8 @@
   display: flex;
   flex-direction: column;
   form {
+    border-top: solid thin;
+    margin-top: 10px;
     display: grid;
     grid-template-columns: 1fr auto auto;
     padding: 10px
@@ -27,19 +29,30 @@
   button:last-of-type {
     grid-column: 3/4;
   }
-  ul {
+  ul.list {
+    .new {
+      animation: appear 300ms;
+    }
     flex: 1;
     list-style: none;
-    padding: 0;
+    padding: 0 10px 10px;
     box-sizing: border-box;
     overflow-y: auto;
     margin: 0;
-    li {
+    > li {
       box-sizing: border-box;
       border: solid thin;
       border-radius: 10px;
-      margin: 10px;
+      margin-top: 10px;
       padding: 10px;
+      transition: 300ms;
+      &.deleted {
+        border-width: 0;
+        padding: 0 10px;
+        margin: 0;
+        opacity: 0;
+        overflow: hidden;
+      }
       span {
         display: inline-block;
         margin-right: 10px;
@@ -49,5 +62,14 @@
         }
       }
     }
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

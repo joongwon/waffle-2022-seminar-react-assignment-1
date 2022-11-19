@@ -225,5 +225,8 @@ export function useApiReviewInfScroll(menu: number, count: number) {
         cancelRef.current = null;
       });
   }, [fetch]);
-  return { refresh, next, data, cancel, loading, error };
+  const update = useCallback((dispatcher: (prev: Review[]) => Review[]) => {
+    setResult((prev) => ({ ...prev, data: dispatcher(prev.data) }));
+  }, []);
+  return { refresh, next, data, cancel, loading, error, update };
 }

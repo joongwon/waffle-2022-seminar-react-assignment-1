@@ -37,6 +37,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   });
   const refreshRef = useRef<Promise<string | null> | null>(null);
   const refresh = useCallback(() => {
+    console.log(refreshRef.current);
     if (!refreshRef.current) {
       setResult((prev) => ({ ...prev, loading: true }));
       refreshRef.current = apiRefresh()
@@ -75,15 +76,14 @@ export function SessionProvider({ children }: PropsWithChildren) {
       try {
         return { payload: await req(token) };
       } catch (e) {
-        console.log(e);
-        if (!(axios.isAxiosError(e) && e.status === 401)) throw e;
+        if (axiosErrorStatus(e) !== 401) throw e;
       }
       const newToken = await refresh();
       if (!newToken) {
         alert && toast.warning("먼저 로그인하세요");
         return { canceled: true };
       }
-      return { payload: await req(token) };
+      return { payload: await req(newToken) };
     },
     [loginInfo?.access_token, refresh]
   );
